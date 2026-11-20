@@ -1,0 +1,31 @@
+[package]
+name = "docmost-app"
+version = "0.1.0"
+edition = "2021"
+authors = ["Docmost Desktop"]
+description = "Docmost Desktop Client with Clean Dark Design and Auto-Updater"
+
+[dependencies]
+tao = "0.37"
+wry = "0.57"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+semver = "1.0"
+ureq = { version = "2.10", features = ["json", "tls"] }
+dirs = "5.0"
+open = "5.3"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_Graphics_Dwm",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_Foundation",
+    "Win32_System_Threading",
+] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
