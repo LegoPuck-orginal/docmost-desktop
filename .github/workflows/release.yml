@@ -52,7 +52,6 @@ jobs:
           name: "Docmost Desktop ${{ github.ref_name }}"
           files: |
             dist/Docmost-Setup.exe
-            target/release/docmost-app.exe
           draft: false
           prerelease: false
           generate_release_notes: true
