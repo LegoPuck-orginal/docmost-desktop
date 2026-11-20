@@ -7,6 +7,14 @@ const CONFIG_FILE_NAME: &str = "config.json";
 pub const DEFAULT_DOCMOST_URL: &str = "https://doc.home.klehausen.de";
 pub const DEFAULT_GITHUB_REPO: &str = "LegoPuck-orginal/docmost-desktop";
 
+fn default_true() -> bool {
+    true
+}
+
+fn default_zoom() -> f64 {
+    1.0
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AppConfig {
     pub server_url: String,
@@ -16,6 +24,16 @@ pub struct AppConfig {
     pub window_width: u32,
     pub window_height: u32,
     pub window_maximized: bool,
+    #[serde(default = "default_true")]
+    pub excalidraw_pen_mode: bool,
+    #[serde(default = "default_true")]
+    pub excalidraw_palm_rejection: bool,
+    #[serde(default = "default_true")]
+    pub excalidraw_dark_theme: bool,
+    #[serde(default = "default_true")]
+    pub excalidraw_quick_toolbar: bool,
+    #[serde(default = "default_zoom")]
+    pub ui_zoom_level: f64,
 }
 
 impl Default for AppConfig {
@@ -28,6 +46,11 @@ impl Default for AppConfig {
             window_width: 1280,
             window_height: 840,
             window_maximized: false,
+            excalidraw_pen_mode: true,
+            excalidraw_palm_rejection: true,
+            excalidraw_dark_theme: true,
+            excalidraw_quick_toolbar: true,
+            ui_zoom_level: 1.0,
         }
     }
 }
@@ -73,6 +96,9 @@ mod tests {
         let config = AppConfig::default();
         assert_eq!(config.server_url, "https://doc.home.klehausen.de");
         assert!(config.check_updates_on_startup);
+        assert!(config.excalidraw_pen_mode);
+        assert!(config.excalidraw_palm_rejection);
+        assert_eq!(config.ui_zoom_level, 1.0);
         assert_eq!(config.window_width, 1280);
         assert_eq!(config.window_height, 840);
     }

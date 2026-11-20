@@ -72,7 +72,7 @@ Führe einfach das mitgelieferte Build-Skript in PowerShell aus:
 
 Das Skript führt automatisch folgende Schritte aus:
 1. Kompiliert das Rust-Projekt hochoptimiert (`cargo build --release`)
-2. Erstellt die NSIS-Installationsdatei `dist\Docmost-Setup.exe`
+2. Erstellt die NSIS-Installations- und Updatedatei `dist\Docmost-Installer.exe`
 3. Zeigt die Dateigrößen und Speicherorte an
 
 ---

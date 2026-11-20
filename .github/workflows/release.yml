@@ -51,7 +51,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: "Docmost Desktop ${{ github.ref_name }}"
           files: |
-            dist/Docmost-Setup.exe
+            dist/Docmost-Installer.exe
           draft: false
           prerelease: false
           generate_release_notes: true

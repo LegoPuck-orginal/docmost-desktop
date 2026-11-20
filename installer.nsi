@@ -1,6 +1,6 @@
 Unicode True
 !define PRODUCT_NAME "Docmost"
-!define PRODUCT_VERSION "0.1.3"
+!define PRODUCT_VERSION "0.1.4"
 !define PRODUCT_PUBLISHER "Docmost Desktop"
 !define PRODUCT_WEB_SITE "https://github.com/LegoPuck-orginal/docmost-desktop"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\docmost-app.exe"
@@ -34,7 +34,7 @@ RequestExecutionLevel user
 !insertmacro MUI_LANGUAGE "German"
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "dist\Docmost-Setup.exe"
+OutFile "dist\Docmost-Installer.exe"
 InstallDir "$LOCALAPPDATA\Programs\Docmost"
 InstallDirRegKey HKCU "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show

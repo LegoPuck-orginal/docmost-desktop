@@ -53,7 +53,7 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-$installerPath = "dist\Docmost-Setup.exe"
+$installerPath = "dist\Docmost-Installer.exe"
 if (-not (Test-Path $installerPath)) {
     Write-Error "Installer $installerPath wurde nicht erzeugt!"
     exit 1
@@ -64,5 +64,5 @@ Write-Host ("✓ Installer erfolgreich erstellt: {0} ({1:N2} MB)" -f $installerP
 
 Write-Host "`n==========================================" -ForegroundColor Cyan
 Write-Host " Fertig! Der Installer liegt bereit:" -ForegroundColor Green
-Write-Host " dist\Docmost-Setup.exe" -ForegroundColor White
+Write-Host " dist\Docmost-Installer.exe" -ForegroundColor White
 Write-Host "==========================================" -ForegroundColor Cyan

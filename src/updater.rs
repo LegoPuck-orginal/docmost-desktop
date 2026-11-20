@@ -55,10 +55,10 @@ pub fn check_for_updates(repo: &str, current_version_str: &str) -> Result<Option
         .map_err(|e| format!("Ungültige lokale Version '{}': {}", current_version_str, e))?;
 
     if remote_ver > current_ver {
-        // Suche nach passender .exe Datei im Release (bevorzuge Setup/Installer)
+        // Suche nach passender .exe Datei im Release (bevorzuge Installer/Setup)
         let exe_asset = resp.assets.iter().find(|a| {
             let lower = a.name.to_lowercase();
-            lower.ends_with(".exe") && (lower.contains("setup") || lower.contains("installer"))
+            lower.ends_with(".exe") && (lower.contains("installer") || lower.contains("install") || lower.contains("setup") || lower.contains("update"))
         }).or_else(|| {
             resp.assets.iter().find(|a| a.name.to_lowercase().ends_with(".exe"))
         });
@@ -134,6 +134,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_github_api_check() {
         let res = check_for_updates("LegoPuck-orginal/docmost-desktop", "0.1.0");
         println!("Result: {:?}", res);

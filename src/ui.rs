@@ -354,35 +354,249 @@ body.has-desktop-nav {
 .excalidraw .Modal__header {
     border-bottom: 1px solid #20273c !important;
 }
+
+/* Touch-Action & Pen Pointer Optimization */
+.excalidraw,
+.excalidraw canvas,
+.excalidraw .interactive,
+.excalidraw-container,
+[data-testid="excalidraw-container"] {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+/* Settings Tabs */
+.docmost-tabs-header {
+    display: flex;
+    border-bottom: 1px solid #20273c;
+    padding: 0 16px;
+    background: #0f121d;
+    gap: 4px;
+}
+.docmost-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.docmost-tab-btn:hover {
+    color: #f1f5f9;
+}
+.docmost-tab-btn.active {
+    color: #818cf8;
+    border-bottom-color: #6366f1;
+    font-weight: 600;
+}
+.docmost-tab-pane {
+    display: none;
+}
+.docmost-tab-pane.active {
+    display: block;
+}
+
+/* Floating Stylus Quick Toolbar */
+#docmost-pen-toolbar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(18, 22, 34, 0.95);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 40px;
+    padding: 6px 14px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+    z-index: 9999999;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+    animation: fadeInToolbar 0.2s ease-out;
+}
+@keyframes fadeInToolbar {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+.docmost-pen-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #cbd5e1;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+}
+.docmost-pen-btn:hover {
+    background: #1e2538;
+    color: #fff;
+    border-color: #2f3b58;
+}
+.docmost-pen-btn.active {
+    background: #6366f1;
+    color: #fff;
+    border-color: #818cf8;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+}
+.docmost-color-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.1s ease;
+    padding: 0;
+}
+.docmost-color-dot:hover {
+    transform: scale(1.25);
+    border-color: #fff;
+}
+.docmost-pen-stroke-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.docmost-pen-stroke-btn:hover {
+    background: #1e2538;
+    color: #fff;
+}
+.docmost-pen-stroke-btn.active {
+    background: #252e46;
+    color: #818cf8;
+    border-color: #6366f1;
+}
 "#;
 
-pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
+pub fn get_injection_script(config: &crate::config::AppConfig, current_version: &str) -> String {
     format!(r#"
 (function() {{
     if (window.__docmostDesktopInitialized) return;
     window.__docmostDesktopInitialized = true;
+
+    // Config State
+    window.__docmostConfig = {{
+        serverUrl: "{url}",
+        githubRepo: "{repo}",
+        autoUpdate: {auto_update},
+        penMode: {pen_mode},
+        palmRejection: {palm_rejection},
+        darkTheme: {dark_theme},
+        quickToolbar: {quick_toolbar},
+        zoomLevel: {zoom_level},
+        version: "{version}"
+    }};
 
     // Inject CSS
     const style = document.createElement('style');
     style.innerHTML = `{css}`;
     document.head.appendChild(style);
 
-    // Auto-sync Excalidraw Dark Mode
-    try {{
-        localStorage.setItem('excalidraw-theme', 'dark');
-        localStorage.setItem('excalidraw-state', JSON.stringify({{ theme: 'dark' }}));
-    }} catch (e) {{}}
+    // Apply Zoom
+    if (window.__docmostConfig.zoomLevel && window.__docmostConfig.zoomLevel !== 1.0) {{
+        document.documentElement.style.zoom = window.__docmostConfig.zoomLevel;
+    }}
+
+    // Auto-sync Excalidraw Dark Mode & Pen Mode
+    const syncExcalidrawState = () => {{
+        try {{
+            const rawState = localStorage.getItem('excalidraw-state');
+            let state = rawState ? JSON.parse(rawState) : {{}};
+            if (window.__docmostConfig.darkTheme) {{
+                state.theme = 'dark';
+                localStorage.setItem('excalidraw-theme', 'dark');
+            }}
+            if (window.__docmostConfig.penMode) {{
+                state.penMode = true;
+                state.penDetected = true;
+            }}
+            localStorage.setItem('excalidraw-state', JSON.stringify(state));
+        }} catch (e) {{}}
+    }};
+    syncExcalidrawState();
 
     const ensureExcalidrawDark = () => {{
-        document.querySelectorAll('.excalidraw').forEach(el => {{
-            if (!el.classList.contains('theme--dark')) {{
-                el.classList.add('theme--dark');
-            }}
-        }});
+        if (window.__docmostConfig.darkTheme) {{
+            document.querySelectorAll('.excalidraw').forEach(el => {{
+                if (!el.classList.contains('theme--dark')) {{
+                    el.classList.add('theme--dark');
+                }}
+            }});
+        }}
     }};
-    const excalidrawObserver = new MutationObserver(ensureExcalidrawDark);
+
+    // Observes Excalidraw appearance & updates Pen Toolbar
+    const checkExcalidrawPresence = () => {{
+        ensureExcalidrawDark();
+        const hasExcalidraw = !!document.querySelector('.excalidraw, [data-testid="excalidraw-container"]');
+        const penToolbar = document.getElementById('docmost-pen-toolbar');
+        if (penToolbar) {{
+            if (hasExcalidraw && window.__docmostConfig.quickToolbar) {{
+                penToolbar.style.display = 'flex';
+            }} else {{
+                penToolbar.style.display = 'none';
+            }}
+        }}
+    }};
+
+    const excalidrawObserver = new MutationObserver(() => {{
+        checkExcalidrawPresence();
+    }});
     excalidrawObserver.observe(document.documentElement, {{ childList: true, subtree: true }});
-    ensureExcalidrawDark();
+    checkExcalidrawPresence();
+
+    // Stylus / Palm Rejection Logic
+    let lastPenContactTime = 0;
+    window.addEventListener('pointerdown', (e) => {{
+        if (e.pointerType === 'pen') {{
+            lastPenContactTime = Date.now();
+            const badge = document.getElementById('badge-palm-rejection');
+            if (badge) badge.style.opacity = '1';
+        }} else if (e.pointerType === 'touch' && window.__docmostConfig.palmRejection) {{
+            const onCanvas = e.target.closest('.excalidraw canvas') || e.target.closest('.excalidraw');
+            // Wenn in den letzten 1200ms ein Stift aktiv war oder PenMode aktiv ist:
+            // Unterdrücke versehentliche Handballen-Touch-Zeichnungen
+            if (onCanvas && (Date.now() - lastPenContactTime < 1200 || window.__docmostConfig.penMode)) {{
+                if (e.isPrimary && !e.shiftKey) {{
+                    e.stopPropagation();
+                }}
+            }}
+        }}
+    }}, true);
+
+    window.addEventListener('pointerup', (e) => {{
+        if (e.pointerType === 'pen') {{
+            lastPenContactTime = Date.now();
+        }}
+    }}, true);
+
+    // Verhindere Windows-Stift Rechtsklick-Menü beim längeren Aufdrücken auf der Leinwand
+    window.addEventListener('contextmenu', (e) => {{
+        if (e.target.closest('.excalidraw canvas') || e.target.closest('.excalidraw')) {{
+            e.preventDefault();
+        }}
+    }}, true);
 
     // Create Navigation Bar
     const nav = document.createElement('div');
@@ -403,16 +617,17 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
             <div id="docmost-update-btn" class="docmost-update-banner" onclick="openUpdateModal()">
                 <span>⬆ Update verfügbar</span>
             </div>
-            <button class="docmost-nav-btn" onclick="openSettingsModal()" title="Einstellungen & Updates">⚙</button>
+            <button class="docmost-nav-btn" onclick="openSettingsModal()" title="Einstellungen, Stift & Updates">⚙</button>
         </div>
     `;
 
-    // Wait for body to append nav
+    // Wait for body to append nav and UI tools
     const appendNav = () => {{
         if (document.body && !document.getElementById('docmost-desktop-nav')) {{
             document.body.classList.add('has-desktop-nav');
             document.body.prepend(nav);
             createModals();
+            createPenToolbar();
         }}
     }};
 
@@ -422,42 +637,212 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
         appendNav();
     }}
 
+    // Pen Toolbar
+    function createPenToolbar() {{
+        if (document.getElementById('docmost-pen-toolbar')) return;
+
+        const tb = document.createElement('div');
+        tb.id = 'docmost-pen-toolbar';
+        tb.innerHTML = `
+            <button id="tb-btn-pen" class="docmost-pen-btn active" onclick="activatePenTool('freedraw')" title="Freihand-Stift (P / 2)">
+                <span>🖊️</span><span>Stift</span>
+            </button>
+            <button id="tb-btn-eraser" class="docmost-pen-btn" onclick="activatePenTool('eraser')" title="Radierer (E / 0)">
+                <span>🧹</span><span>Radierer</span>
+            </button>
+            <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
+            <!-- Quick Colors -->
+            <button class="docmost-color-dot" style="background:#ffffff;" onclick="setPenColor('#ffffff')" title="Weiß"></button>
+            <button class="docmost-color-dot" style="background:#818cf8;" onclick="setPenColor('#818cf8')" title="Indigo"></button>
+            <button class="docmost-color-dot" style="background:#34d399;" onclick="setPenColor('#34d399')" title="Smaragdgrün"></button>
+            <button class="docmost-color-dot" style="background:#fbbf24;" onclick="setPenColor('#fbbf24')" title="Sonnengelb"></button>
+            <button class="docmost-color-dot" style="background:#f87171;" onclick="setPenColor('#f87171')" title="Korallenrot"></button>
+            <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
+            <!-- Stroke Widths -->
+            <button class="docmost-pen-stroke-btn" onclick="setPenStroke(1)" title="Feine Strichstärke">―</button>
+            <button class="docmost-pen-stroke-btn active" onclick="setPenStroke(2)" title="Mittlere Strichstärke">━</button>
+            <button class="docmost-pen-stroke-btn" onclick="setPenStroke(4)" title="Breite Strichstärke">█</button>
+            <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
+            <!-- Palm Rejection Badge -->
+            <div id="badge-palm-rejection" style="font-size:11px; color:#10b981; display:flex; align-items:center; gap:4px; padding:3px 8px; background:rgba(16,185,129,0.12); border-radius:12px;" title="Handballenschutz & Stiftmodus aktiv">
+                <span>🖐️</span><span>Stift aktiv</span>
+            </div>
+            <!-- Undo / Redo -->
+            <button class="docmost-pen-btn" onclick="penUndo()" title="Rückgängig (Strg+Z)">↩</button>
+            <button class="docmost-pen-btn" onclick="penRedo()" title="Wiederholen (Strg+Y)">↪</button>
+            <button class="docmost-pen-btn" style="padding:4px 8px; color:#94a3b8;" onclick="document.getElementById('docmost-pen-toolbar').style.display='none'" title="Leiste ausblenden">✕</button>
+        `;
+        document.body.appendChild(tb);
+    }}
+
+    window.activatePenTool = function(type) {{
+        const btnPen = document.getElementById('tb-btn-pen');
+        const btnEraser = document.getElementById('tb-btn-eraser');
+        if (type === 'freedraw') {{
+            if (btnPen) btnPen.classList.add('active');
+            if (btnEraser) btnEraser.classList.remove('active');
+            const el = document.querySelector('input[value="freedraw"]') || 
+                       document.querySelector('[data-testid="freedraw"]') ||
+                       document.querySelector('button[aria-label*="Draw"]') ||
+                       document.querySelector('button[aria-label*="Freihand"]');
+            if (el) {{ el.click(); }}
+            else {{ document.dispatchEvent(new KeyboardEvent('keydown', {{ key: 'p', code: 'KeyP', bubbles: true }})); }}
+        }} else if (type === 'eraser') {{
+            if (btnEraser) btnEraser.classList.add('active');
+            if (btnPen) btnPen.classList.remove('active');
+            const el = document.querySelector('input[value="eraser"]') || 
+                       document.querySelector('[data-testid="eraser"]') ||
+                       document.querySelector('button[aria-label*="Eraser"]') ||
+                       document.querySelector('button[aria-label*="Radierer"]');
+            if (el) {{ el.click(); }}
+            else {{ document.dispatchEvent(new KeyboardEvent('keydown', {{ key: 'e', code: 'KeyE', bubbles: true }})); }}
+        }}
+    }};
+
+    window.setPenColor = function(hex) {{
+        const swatches = document.querySelectorAll('.color-picker-swatch, .color-picker input, [data-testid="color-picker"] button');
+        for (const s of swatches) {{
+            if (s.title && s.title.toLowerCase().includes(hex.toLowerCase())) {{
+                s.click();
+                return;
+            }}
+        }}
+        // Fallback: update excalidraw-state in localStorage
+        try {{
+            const raw = localStorage.getItem('excalidraw-state');
+            if (raw) {{
+                const st = JSON.parse(raw);
+                st.currentItemStrokeColor = hex;
+                localStorage.setItem('excalidraw-state', JSON.stringify(st));
+            }}
+        }} catch(e) {{}}
+    }};
+
+    window.setPenStroke = function(width) {{
+        document.querySelectorAll('.docmost-pen-stroke-btn').forEach(b => b.classList.remove('active'));
+        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+        try {{
+            const raw = localStorage.getItem('excalidraw-state');
+            if (raw) {{
+                const st = JSON.parse(raw);
+                st.currentItemStrokeWidth = width;
+                localStorage.setItem('excalidraw-state', JSON.stringify(st));
+            }}
+        }} catch(e) {{}}
+    }};
+
+    window.penUndo = function() {{
+        document.dispatchEvent(new KeyboardEvent('keydown', {{ key: 'z', code: 'KeyZ', ctrlKey: true, bubbles: true }}));
+    }};
+    window.penRedo = function() {{
+        document.dispatchEvent(new KeyboardEvent('keydown', {{ key: 'y', code: 'KeyY', ctrlKey: true, bubbles: true }}));
+    }};
+
     // Modals
     function createModals() {{
         if (document.getElementById('docmost-settings-modal')) return;
 
         const modalContainer = document.createElement('div');
         modalContainer.innerHTML = `
-            <!-- Settings Modal -->
+            <!-- Tabbed Settings Modal -->
             <div id="docmost-settings-modal" class="docmost-modal-overlay">
-                <div class="docmost-modal-box">
+                <div class="docmost-modal-box" style="width: 540px;">
                     <div class="docmost-modal-header">
                         <h3 style="margin:0; font-size: 16px;">Docmost Desktop Einstellungen</h3>
                         <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="closeSettingsModal()">✕</span>
                     </div>
-                    <div class="docmost-modal-body">
-                        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Docmost Server URL</label>
-                        <input id="input-server-url" type="text" value="{url}" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:16px;" />
-                        
-                        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">GitHub Repository (für Updates)</label>
-                        <input id="input-github-repo" type="text" value="LegoPuck-orginal/docmost-desktop" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:16px;" />
-                        
-                        <div style="margin-bottom:16px;">
-                            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
-                                <input id="check-auto-update" type="checkbox" checked />
-                                <span>Automatisch beim Start nach Updates suchen</span>
-                            </label>
+
+                    <!-- Tabs Header -->
+                    <div class="docmost-tabs-header">
+                        <button id="tab-btn-general" class="docmost-tab-btn active" onclick="switchSettingsTab('general')">⚙ Allgemein</button>
+                        <button id="tab-btn-pen" class="docmost-tab-btn" onclick="switchSettingsTab('pen')">🖊️ Stift & Excalidraw</button>
+                        <button id="tab-btn-updates" class="docmost-tab-btn" onclick="switchSettingsTab('updates')">🔄 Updates</button>
+                    </div>
+
+                    <div class="docmost-modal-body" style="padding: 18px 20px;">
+                        <!-- Tab 1: Allgemein -->
+                        <div id="pane-general" class="docmost-tab-pane active">
+                            <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Docmost Server URL</label>
+                            <input id="input-server-url" type="text" value="{url}" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:14px;" />
+                            
+                            <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">GitHub Repository (für Updates)</label>
+                            <input id="input-github-repo" type="text" value="{repo}" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:14px;" />
+                            
+                            <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Oberflächen-Skalierung (Zoom)</label>
+                            <select id="select-ui-zoom" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:6px;">
+                                <option value="0.9">90% (Kompakt)</option>
+                                <option value="1.0">100% (Standard)</option>
+                                <option value="1.1">110% (Leicht vergrößert)</option>
+                                <option value="1.25">125% (Ideal für Surface / Touch)</option>
+                                <option value="1.5">150% (Sehr groß)</option>
+                            </select>
                         </div>
 
-                        <div style="background:#0e111a; padding:12px; border-radius:6px; border:1px solid #20273c; font-size:12px; color:#94a3b8;">
-                            <div>Installierte Version: <strong style="color:#e2e8f0;">v{version}</strong></div>
-                            <div id="update-status-text" style="margin-top:6px; color:#10b981;">✓ Status: Bereit</div>
+                        <!-- Tab 2: Stift & Excalidraw -->
+                        <div id="pane-pen" class="docmost-tab-pane">
+                            <div style="font-size: 13px; font-weight:600; color:#818cf8; margin-bottom: 12px; display:flex; align-items:center; gap:6px;">
+                                <span>🖊️</span><span>Optimierung für Stylus, Surface Pen & Touchscreen</span>
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
+                                    <input id="check-pen-mode" type="checkbox" {checked_pen_mode} style="margin-top:2px;" />
+                                    <div>
+                                        <div style="font-weight:600; color:#f1f5f9;">Stift-Modus (Pen-Only Mode)</div>
+                                        <div style="font-size:11px; color:#94a3b8;">Nur der digitale Stift zeichnet; Fingergesten scrollen oder zoomen die Leinwand.</div>
+                                    </div>
+                                </label>
+
+                                <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
+                                    <input id="check-palm-rejection" type="checkbox" {checked_palm_rejection} style="margin-top:2px;" />
+                                    <div>
+                                        <div style="font-weight:600; color:#f1f5f9;">Handballen-Schutz (Palm Rejection)</div>
+                                        <div style="font-size:11px; color:#94a3b8;">Ignoriert aufliegende Handflächen während des Zeichnens automatisch.</div>
+                                    </div>
+                                </label>
+
+                                <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
+                                    <input id="check-quick-toolbar" type="checkbox" {checked_quick_toolbar} style="margin-top:2px;" />
+                                    <div>
+                                        <div style="font-weight:600; color:#f1f5f9;">Schwebende Schnellzugriffsleiste</div>
+                                        <div style="font-size:11px; color:#94a3b8;">Zeigt beim Zeichnen eine ergonomische Leiste für Stift, Radierer, Farben und Stärken.</div>
+                                    </div>
+                                </label>
+
+                                <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
+                                    <input id="check-excalidraw-dark" type="checkbox" {checked_dark_theme} style="margin-top:2px;" />
+                                    <div>
+                                        <div style="font-weight:600; color:#f1f5f9;">Clean Dark für Excalidraw erzwingen</div>
+                                        <div style="font-size:11px; color:#94a3b8;">Tiefdunkler Zeichenhintergrund ohne blendendes Weiß.</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Updates -->
+                        <div id="pane-updates" class="docmost-tab-pane">
+                            <div style="margin-bottom:14px;">
+                                <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+                                    <input id="check-auto-update" type="checkbox" {checked_auto_up} />
+                                    <span>Automatisch beim Start nach Updates suchen</span>
+                                </label>
+                            </div>
+
+                            <div style="background:#0e111a; padding:12px; border-radius:6px; border:1px solid #20273c; font-size:12px; color:#94a3b8; margin-bottom:14px;">
+                                <div>Installierte Version: <strong style="color:#e2e8f0;">v{version}</strong></div>
+                                <div id="update-status-text" style="margin-top:6px; color:#10b981;">✓ Status: Bereit</div>
+                            </div>
+
+                            <div style="display:flex; gap:8px;">
+                                <button class="docmost-btn-secondary" onclick="checkUpdatesManually()" style="flex:1;">Jetzt nach Updates suchen</button>
+                                <button class="docmost-btn-secondary" onclick="testUpdateModalPreview()" style="flex:1;" title="Öffnet das Update-Fenster als Vorschau">Fenster-Vorschau testen</button>
+                            </div>
                         </div>
                     </div>
+
                     <div class="docmost-modal-footer">
-                        <button class="docmost-btn-secondary" onclick="testUpdateModalPreview()" style="font-size:11px;" title="Öffnet das Update-Fenster als Vorschau">Fenster-Vorschau testen</button>
-                        <button class="docmost-btn-secondary" onclick="checkUpdatesManually()">Jetzt nach Updates suchen</button>
-                        <button class="docmost-btn-primary" onclick="saveSettings()">Speichern & Neu laden</button>
+                        <button class="docmost-btn-secondary" onclick="closeSettingsModal()">Abbrechen</button>
+                        <button class="docmost-btn-primary" onclick="saveSettings()">Speichern & Übernehmen</button>
                     </div>
                 </div>
             </div>
@@ -489,6 +874,12 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
         `;
         document.body.appendChild(modalContainer);
 
+        // Pre-select Zoom in dropdown
+        const zoomSelect = document.getElementById('select-ui-zoom');
+        if (zoomSelect) {{
+            zoomSelect.value = String(window.__docmostConfig.zoomLevel || 1.0);
+        }}
+
         // Falls bereits ein Update empfangen wurde, sofort anzeigen
         if (window.__pendingUpdateInfo) {{
             window.onUpdateAvailable(window.__pendingUpdateInfo);
@@ -498,6 +889,16 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
             window.ipc.postMessage(JSON.stringify({{ action: 'check_pending_update' }}));
         }}
     }}
+
+    window.switchSettingsTab = function(tabName) {{
+        document.querySelectorAll('.docmost-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.docmost-tab-pane').forEach(p => p.classList.remove('active'));
+
+        const btn = document.getElementById('tab-btn-' + tabName);
+        const pane = document.getElementById('pane-' + tabName);
+        if (btn) btn.classList.add('active');
+        if (pane) pane.classList.add('active');
+    }};
 
     window.openSettingsModal = function() {{
         const el = document.getElementById('docmost-settings-modal');
@@ -522,7 +923,7 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
         window.onUpdateAvailable({{
             version: 'v0.9.9',
             title: 'Docmost Desktop v0.9.9 (Vorschau)',
-            changelog: '• Dies ist eine Vorschau des automatischen Update-Fensters!\n• Clean Dark Design aktiv.\n• Sobald eine neue Version auf GitHub existiert, öffnet sich dieses Fenster vollautomatisch beim Start.',
+            changelog: '• Dies ist eine Vorschau des automatischen Update-Fensters!\n• Clean Dark Design & Stift-Unterstützung aktiv.\n• Sobald eine neue Version auf GitHub existiert, öffnet sich dieses Fenster vollautomatisch beim Start.',
             download_url: ''
         }});
     }};
@@ -531,20 +932,50 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
         const urlInput = document.getElementById('input-server-url');
         const repoInput = document.getElementById('input-github-repo');
         const autoUpInput = document.getElementById('check-auto-update');
+        const penModeInput = document.getElementById('check-pen-mode');
+        const palmRejInput = document.getElementById('check-palm-rejection');
+        const quickTbInput = document.getElementById('check-quick-toolbar');
+        const darkThemeInput = document.getElementById('check-excalidraw-dark');
+        const zoomSelect = document.getElementById('select-ui-zoom');
+
         const newUrl = urlInput ? urlInput.value.trim() : '';
         const newRepo = repoInput ? repoInput.value.trim() : '';
         const autoUp = autoUpInput ? autoUpInput.checked : true;
+        const penMode = penModeInput ? penModeInput.checked : true;
+        const palmRejection = palmRejInput ? palmRejInput.checked : true;
+        const quickToolbar = quickTbInput ? quickTbInput.checked : true;
+        const darkTheme = darkThemeInput ? darkThemeInput.checked : true;
+        const zoomLevel = zoomSelect ? parseFloat(zoomSelect.value) : 1.0;
+
+        window.__docmostConfig.serverUrl = newUrl;
+        window.__docmostConfig.githubRepo = newRepo;
+        window.__docmostConfig.autoUpdate = autoUp;
+        window.__docmostConfig.penMode = penMode;
+        window.__docmostConfig.palmRejection = palmRejection;
+        window.__docmostConfig.quickToolbar = quickToolbar;
+        window.__docmostConfig.darkTheme = darkTheme;
+        window.__docmostConfig.zoomLevel = zoomLevel;
+
+        // Apply zoom immediately
+        document.documentElement.style.zoom = zoomLevel;
+        checkExcalidrawPresence();
+        syncExcalidrawState();
 
         if (window.ipc) {{
             window.ipc.postMessage(JSON.stringify({{
                 action: 'save_settings',
                 server_url: newUrl,
                 github_repo: newRepo,
-                check_updates_on_startup: autoUp
+                check_updates_on_startup: autoUp,
+                excalidraw_pen_mode: penMode,
+                excalidraw_palm_rejection: palmRejection,
+                excalidraw_quick_toolbar: quickToolbar,
+                excalidraw_dark_theme: darkTheme,
+                ui_zoom_level: zoomLevel
             }}));
         }}
         closeSettingsModal();
-        if (newUrl) {{
+        if (newUrl && newUrl !== window.location.href && newUrl !== window.__docmostConfig.serverUrl) {{
             window.location.href = newUrl;
         }}
     }};
@@ -600,9 +1031,21 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
 }})();
     "#,
     css = CLEAN_DARK_GLOBAL_CSS,
-    url = server_url,
-    url_display = server_url.replace("https://", "").replace("http://", ""),
-    version = current_version
+    url = config.server_url,
+    url_display = config.server_url.replace("https://", "").replace("http://", ""),
+    repo = config.github_repo,
+    auto_update = config.check_updates_on_startup,
+    pen_mode = config.excalidraw_pen_mode,
+    palm_rejection = config.excalidraw_palm_rejection,
+    dark_theme = config.excalidraw_dark_theme,
+    quick_toolbar = config.excalidraw_quick_toolbar,
+    zoom_level = config.ui_zoom_level,
+    version = current_version,
+    checked_pen_mode = if config.excalidraw_pen_mode { "checked" } else { "" },
+    checked_palm_rejection = if config.excalidraw_palm_rejection { "checked" } else { "" },
+    checked_quick_toolbar = if config.excalidraw_quick_toolbar { "checked" } else { "" },
+    checked_dark_theme = if config.excalidraw_dark_theme { "checked" } else { "" },
+    checked_auto_up = if config.check_updates_on_startup { "checked" } else { "" }
     )
 }
 

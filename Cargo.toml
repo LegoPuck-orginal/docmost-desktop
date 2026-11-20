@@ -1,6 +1,6 @@
 [package]
 name = "docmost-app"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 authors = ["Docmost Desktop"]
 description = "Docmost Desktop Client with Clean Dark Design and Auto-Updater"

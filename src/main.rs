@@ -22,6 +22,11 @@ struct IpcMessage {
     github_repo: Option<String>,
     check_updates_on_startup: Option<bool>,
     download_url: Option<String>,
+    excalidraw_pen_mode: Option<bool>,
+    excalidraw_palm_rejection: Option<bool>,
+    excalidraw_dark_theme: Option<bool>,
+    excalidraw_quick_toolbar: Option<bool>,
+    ui_zoom_level: Option<f64>,
 }
 
 #[derive(Debug, Clone)]
@@ -82,7 +87,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let _ = std::fs::create_dir_all(&data_dir);
 
     let mut web_context = WebContext::new(Some(data_dir));
-    let injection_script = ui::get_injection_script(&config.server_url, current_version);
+    let injection_script = ui::get_injection_script(&config, current_version);
 
     let mut builder = WebViewBuilder::new_with_web_context(&mut web_context)
         .with_initialization_script(&injection_script);
@@ -112,6 +117,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         if let Some(auto_up) = parsed.check_updates_on_startup {
                             cfg.check_updates_on_startup = auto_up;
+                        }
+                        if let Some(pm) = parsed.excalidraw_pen_mode {
+                            cfg.excalidraw_pen_mode = pm;
+                        }
+                        if let Some(pr) = parsed.excalidraw_palm_rejection {
+                            cfg.excalidraw_palm_rejection = pr;
+                        }
+                        if let Some(dt) = parsed.excalidraw_dark_theme {
+                            cfg.excalidraw_dark_theme = dt;
+                        }
+                        if let Some(qt) = parsed.excalidraw_quick_toolbar {
+                            cfg.excalidraw_quick_toolbar = qt;
+                        }
+                        if let Some(zoom) = parsed.ui_zoom_level {
+                            cfg.ui_zoom_level = zoom;
                         }
                         let _ = cfg.save();
                     }
