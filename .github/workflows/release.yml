@@ -28,15 +28,21 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Install NSIS
-        run: choco install nsis -y
+        run: |
+          choco install nsis -y
+          echo "C:\Program Files (x86)\NSIS" >> $env:GITHUB_PATH
 
       - name: Build Release Binary
         run: cargo build --release
 
       - name: Build NSIS Setup Installer
         run: |
-          mkdir dist -Force
-          makensis installer.nsi
+          if (-not (Test-Path "dist")) { New-Item -ItemType Directory -Path "dist" -Force | Out-Null }
+          if (Get-Command makensis -ErrorAction SilentlyContinue) {
+            makensis installer.nsi
+          } else {
+            & "C:\Program Files (x86)\NSIS\makensis.exe" installer.nsi
+          }
 
       - name: Create GitHub Release & Upload Assets
         uses: softprops/action-gh-release@v2
