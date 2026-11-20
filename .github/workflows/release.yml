@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -38,9 +40,9 @@ jobs:
 
       - name: Create GitHub Release & Upload Assets
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: "Docmost Desktop ${{ github.ref_name }}"
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.0' }}
+          name: "Docmost Desktop ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.0' }}"
           files: |
             dist/Docmost-Setup.exe
             target/release/docmost-app.exe
