@@ -45,10 +45,11 @@ jobs:
           }
 
       - name: Create GitHub Release & Upload Assets
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.0' }}
-          name: "Docmost Desktop ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.1.0' }}"
+          tag_name: ${{ github.ref_name }}
+          name: "Docmost Desktop ${{ github.ref_name }}"
           files: |
             dist/Docmost-Setup.exe
             target/release/docmost-app.exe

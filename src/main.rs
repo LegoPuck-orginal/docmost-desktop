@@ -24,7 +24,7 @@ struct IpcMessage {
     download_url: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum UserEvent {
     UpdateAvailable(updater::ReleaseInfo),
     UpdateCheckFinished(String),
@@ -70,6 +70,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let shared_config_for_ipc = Arc::clone(&shared_config);
     let proxy_for_ipc = proxy.clone();
 
+    let pending_update: Arc<Mutex<Option<updater::ReleaseInfo>>> = Arc::new(Mutex::new(None));
+    let pending_update_for_ipc = Arc::clone(&pending_update);
+    let pending_update_for_events = Arc::clone(&pending_update);
+
     // Lokaler Ordner für persistente Cookies, Sessions und Caches
     let data_dir = dirs::data_local_dir()
         .unwrap_or_else(|| std::path::PathBuf::from("."))
@@ -111,16 +115,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         let _ = cfg.save();
                     }
+                    "check_pending_update" => {
+                        let maybe_info = pending_update_for_ipc.lock().unwrap().clone();
+                        if let Some(info) = maybe_info {
+                            let _ = proxy_for_ipc.send_event(UserEvent::UpdateAvailable(info));
+                        }
+                    }
                     "check_updates" => {
                         let cfg = shared_config_for_ipc.lock().unwrap().clone();
                         let p = proxy_for_ipc.clone();
+                        let cur_ver = env!("CARGO_PKG_VERSION").to_string();
+                        let pend = Arc::clone(&pending_update_for_ipc);
                         thread::spawn(move || {
-                            match updater::check_for_updates(&cfg.github_repo, env!("CARGO_PKG_VERSION")) {
+                            match updater::check_for_updates(&cfg.github_repo, &cur_ver) {
                                 Ok(Some(info)) => {
+                                    *pend.lock().unwrap() = Some(info.clone());
                                     let _ = p.send_event(UserEvent::UpdateAvailable(info));
                                 }
                                 Ok(None) => {
-                                    let _ = p.send_event(UserEvent::UpdateCheckFinished("Aktuellste Version installiert".to_string()));
+                                    let _ = p.send_event(UserEvent::UpdateCheckFinished(format!("Du hast bereits die aktuellste Version (v{})!", cur_ver)));
                                 }
                                 Err(err) => {
                                     let _ = p.send_event(UserEvent::UpdateCheckFinished(format!("Fehler: {}", err)));
@@ -151,10 +164,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let repo = config.github_repo.clone();
         let cur_ver = current_version.to_string();
         let p = proxy.clone();
+        let pend = Arc::clone(&pending_update);
         thread::spawn(move || {
             // Kurze Pause von 2 Sekunden für reibungslosen UI-Start
             thread::sleep(Duration::from_secs(2));
             if let Ok(Some(info)) = updater::check_for_updates(&repo, &cur_ver) {
+                *pend.lock().unwrap() = Some(info.clone());
+                let _ = p.send_event(UserEvent::UpdateAvailable(info.clone()));
+
+                // Nochmal nach 3 Sekunden senden falls die Webseite gerade erst geladen/weitergeleitet hat
+                thread::sleep(Duration::from_secs(3));
                 let _ = p.send_event(UserEvent::UpdateAvailable(info));
             }
         });
@@ -166,17 +185,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         match event {
             Event::UserEvent(user_event) => match user_event {
                 UserEvent::UpdateAvailable(info) => {
+                    *pending_update_for_events.lock().unwrap() = Some(info.clone());
                     if let Ok(json) = serde_json::to_string(&info) {
                         let script = format!(
-                            "if (window.onUpdateAvailable) {{ window.onUpdateAvailable({}); }}",
-                            json
+                            "window.__pendingUpdateInfo = {json}; if (typeof window.onUpdateAvailable === 'function') {{ window.onUpdateAvailable({json}); }}",
+                            json = json
                         );
                         let _ = webview.evaluate_script(&script);
                     }
                 }
                 UserEvent::UpdateCheckFinished(status) => {
                     let script = format!(
-                        "const el = document.getElementById('update-status-text'); if(el) {{ el.innerText = '{}'; }}",
+                        "const el = document.getElementById('update-status-text'); if(el) {{ el.innerText = '{}'; el.style.color = '#10b981'; }}",
                         status.replace('\'', "\\'")
                     );
                     let _ = webview.evaluate_script(&script);

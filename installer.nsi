@@ -1,6 +1,6 @@
 Unicode True
 !define PRODUCT_NAME "Docmost"
-!define PRODUCT_VERSION "0.1.2"
+!define PRODUCT_VERSION "0.1.3"
 !define PRODUCT_PUBLISHER "Docmost Desktop"
 !define PRODUCT_WEB_SITE "https://github.com/LegoPuck-orginal/docmost-desktop"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\docmost-app.exe"

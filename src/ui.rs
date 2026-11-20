@@ -424,6 +424,8 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
 
     // Modals
     function createModals() {{
+        if (document.getElementById('docmost-settings-modal')) return;
+
         const modalContainer = document.createElement('div');
         modalContainer.innerHTML = `
             <!-- Settings Modal -->
@@ -431,7 +433,7 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
                 <div class="docmost-modal-box">
                     <div class="docmost-modal-header">
                         <h3 style="margin:0; font-size: 16px;">Docmost Desktop Einstellungen</h3>
-                        <span style="cursor:pointer; color:#94a3b8;" onclick="closeSettingsModal()">✕</span>
+                        <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="closeSettingsModal()">✕</span>
                     </div>
                     <div class="docmost-modal-body">
                         <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Docmost Server URL</label>
@@ -449,10 +451,11 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
 
                         <div style="background:#0e111a; padding:12px; border-radius:6px; border:1px solid #20273c; font-size:12px; color:#94a3b8;">
                             <div>Installierte Version: <strong style="color:#e2e8f0;">v{version}</strong></div>
-                            <div id="update-status-text" style="margin-top:4px; color:#10b981;">✓ Status: Verbunden</div>
+                            <div id="update-status-text" style="margin-top:6px; color:#10b981;">✓ Status: Bereit</div>
                         </div>
                     </div>
                     <div class="docmost-modal-footer">
+                        <button class="docmost-btn-secondary" onclick="testUpdateModalPreview()" style="font-size:11px;" title="Öffnet das Update-Fenster als Vorschau">Fenster-Vorschau testen</button>
                         <button class="docmost-btn-secondary" onclick="checkUpdatesManually()">Jetzt nach Updates suchen</button>
                         <button class="docmost-btn-primary" onclick="saveSettings()">Speichern & Neu laden</button>
                     </div>
@@ -464,14 +467,14 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
                 <div class="docmost-modal-box">
                     <div class="docmost-modal-header" style="background: linear-gradient(135deg, #1e1b4b, #1e293b);">
                         <h3 style="margin:0; font-size: 16px; color:#a5b4fc;">🚀 Neues Update verfügbar!</h3>
-                        <span style="cursor:pointer; color:#94a3b8;" onclick="closeUpdateModal()">✕</span>
+                        <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="closeUpdateModal()">✕</span>
                     </div>
                     <div class="docmost-modal-body">
-                        <div style="font-size:14px; font-weight:600; margin-bottom:8px;" id="update-modal-title">Docmost Setup v0.0.0</div>
-                        <div style="font-size:12px; color:#94a3b8; margin-bottom:12px;">Eine neue Version steht auf GitHub bereit.</div>
-                        <div id="update-modal-changelog" style="background:#0e111a; padding:12px; border-radius:6px; border:1px solid #20273c; font-size:12px; max-height:160px; overflow-y:auto; white-space:pre-wrap; color:#cbd5e1;"></div>
-                        <div id="update-progress-box" style="display:none; margin-top:12px;">
-                            <div style="font-size:12px; color:#818cf8; margin-bottom:6px;">Lade Update herunter...</div>
+                        <div style="font-size:15px; font-weight:700; color:#f1f5f9; margin-bottom:4px;" id="update-modal-title">Docmost Desktop Update</div>
+                        <div style="font-size:12px; color:#94a3b8; margin-bottom:12px;">Eine neue Version steht auf GitHub bereit und kann mit einem Klick installiert werden.</div>
+                        <div id="update-modal-changelog" style="background:#0e111a; padding:12px; border-radius:6px; border:1px solid #20273c; font-size:12px; max-height:160px; overflow-y:auto; white-space:pre-wrap; color:#cbd5e1; font-family: monospace;"></div>
+                        <div id="update-progress-box" style="display:none; margin-top:14px;">
+                            <div style="font-size:12px; color:#818cf8; margin-bottom:6px; font-weight:600;">Lade Update herunter und starte Installer...</div>
                             <div style="background:#0e111a; height:8px; border-radius:4px; overflow:hidden;">
                                 <div id="update-progress-bar" style="background:#6366f1; width:100%; height:100%; animation: pulseGlow 1.5s infinite;"></div>
                             </div>
@@ -485,26 +488,53 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
             </div>
         `;
         document.body.appendChild(modalContainer);
+
+        // Falls bereits ein Update empfangen wurde, sofort anzeigen
+        if (window.__pendingUpdateInfo) {{
+            window.onUpdateAvailable(window.__pendingUpdateInfo);
+        }}
+        // Backend nach anstehendem Update abfragen
+        if (window.ipc) {{
+            window.ipc.postMessage(JSON.stringify({{ action: 'check_pending_update' }}));
+        }}
     }}
 
     window.openSettingsModal = function() {{
-        document.getElementById('docmost-settings-modal').style.display = 'flex';
+        const el = document.getElementById('docmost-settings-modal');
+        if (el) el.style.display = 'flex';
     }};
     window.closeSettingsModal = function() {{
-        document.getElementById('docmost-settings-modal').style.display = 'none';
+        const el = document.getElementById('docmost-settings-modal');
+        if (el) el.style.display = 'none';
     }};
 
     window.openUpdateModal = function() {{
-        document.getElementById('docmost-update-modal').style.display = 'flex';
+        const el = document.getElementById('docmost-update-modal');
+        if (el) el.style.display = 'flex';
     }};
     window.closeUpdateModal = function() {{
-        document.getElementById('docmost-update-modal').style.display = 'none';
+        const el = document.getElementById('docmost-update-modal');
+        if (el) el.style.display = 'none';
+    }};
+
+    window.testUpdateModalPreview = function() {{
+        window.closeSettingsModal();
+        window.onUpdateAvailable({{
+            version: 'v0.9.9',
+            title: 'Docmost Desktop v0.9.9 (Vorschau)',
+            changelog: '• Dies ist eine Vorschau des automatischen Update-Fensters!\n• Clean Dark Design aktiv.\n• Sobald eine neue Version auf GitHub existiert, öffnet sich dieses Fenster vollautomatisch beim Start.',
+            download_url: ''
+        }});
     }};
 
     window.saveSettings = function() {{
-        const newUrl = document.getElementById('input-server-url').value.trim();
-        const newRepo = document.getElementById('input-github-repo').value.trim();
-        const autoUp = document.getElementById('check-auto-update').checked;
+        const urlInput = document.getElementById('input-server-url');
+        const repoInput = document.getElementById('input-github-repo');
+        const autoUpInput = document.getElementById('check-auto-update');
+        const newUrl = urlInput ? urlInput.value.trim() : '';
+        const newRepo = repoInput ? repoInput.value.trim() : '';
+        const autoUp = autoUpInput ? autoUpInput.checked : true;
+
         if (window.ipc) {{
             window.ipc.postMessage(JSON.stringify({{
                 action: 'save_settings',
@@ -521,32 +551,49 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
 
     window.checkUpdatesManually = function() {{
         const statusText = document.getElementById('update-status-text');
-        statusText.style.color = '#38bdf8';
-        statusText.innerText = 'Prüfe GitHub auf Updates...';
+        if (statusText) {{
+            statusText.style.color = '#38bdf8';
+            statusText.innerText = 'Prüfe GitHub auf Updates...';
+        }}
         if (window.ipc) {{
             window.ipc.postMessage(JSON.stringify({{ action: 'check_updates' }}));
         }}
     }};
 
-    let cachedUpdateInfo = null;
     window.onUpdateAvailable = function(info) {{
-        cachedUpdateInfo = info;
+        if (!info) return;
+        window.__pendingUpdateInfo = info;
+        window.closeSettingsModal();
+
         const banner = document.getElementById('docmost-update-btn');
-        if (banner) banner.style.display = 'flex';
-        document.getElementById('update-modal-title').innerText = info.title || ('Version ' + info.version);
-        document.getElementById('update-modal-changelog').innerText = info.changelog || 'Keine Versionshinweise vorhanden.';
-        openUpdateModal();
+        if (banner) {{
+            banner.style.display = 'flex';
+            banner.innerHTML = '<span>⬆ Update verfügbar (' + (info.version || '') + ')</span>';
+        }}
+        const titleEl = document.getElementById('update-modal-title');
+        if (titleEl) titleEl.innerText = info.title || ('Version ' + info.version);
+        const clEl = document.getElementById('update-modal-changelog');
+        if (clEl) clEl.innerText = info.changelog || 'Keine Versionshinweise vorhanden.';
+        window.openUpdateModal();
     }};
 
     window.performUpdate = function() {{
-        if (!cachedUpdateInfo) return;
-        document.getElementById('update-progress-box').style.display = 'block';
-        document.getElementById('btn-do-update').disabled = true;
-        document.getElementById('btn-do-update').innerText = 'Wird installiert...';
+        const info = window.__pendingUpdateInfo;
+        if (!info || !info.download_url) {{
+            alert('Vorschaumodus: Es ist keine Download-URL hinterlegt.');
+            return;
+        }}
+        const pBox = document.getElementById('update-progress-box');
+        if (pBox) pBox.style.display = 'block';
+        const btn = document.getElementById('btn-do-update');
+        if (btn) {{
+            btn.disabled = true;
+            btn.innerText = 'Wird heruntergeladen & installiert...';
+        }}
         if (window.ipc) {{
             window.ipc.postMessage(JSON.stringify({{
                 action: 'download_and_install_update',
-                download_url: cachedUpdateInfo.download_url
+                download_url: info.download_url
             }}));
         }}
     }};
