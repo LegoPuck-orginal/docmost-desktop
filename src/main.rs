@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod config;
+mod icon_data;
 mod ui;
 mod updater;
 
@@ -36,8 +37,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let event_loop = EventLoopBuilder::<UserEvent>::with_user_event().build();
     let proxy = event_loop.create_proxy();
 
+    let icon = tao::window::Icon::from_rgba(icon_data::ICON_RGBA_32.to_vec(), 32, 32).ok();
+
     let window = WindowBuilder::new()
         .with_title("Docmost")
+        .with_window_icon(icon)
         .with_inner_size(LogicalSize::new(
             config.window_width as f64,
             config.window_height as f64,

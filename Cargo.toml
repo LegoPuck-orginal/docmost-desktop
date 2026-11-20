@@ -1,6 +1,6 @@
 [package]
 name = "docmost-app"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Docmost Desktop"]
 description = "Docmost Desktop Client with Clean Dark Design and Auto-Updater"
@@ -22,6 +22,9 @@ windows-sys = { version = "0.59", features = [
     "Win32_Foundation",
     "Win32_System_Threading",
 ] }
+
+[build-dependencies]
+winres = "0.1"
 
 [profile.release]
 opt-level = 3

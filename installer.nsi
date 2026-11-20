@@ -1,6 +1,6 @@
 Unicode True
 !define PRODUCT_NAME "Docmost"
-!define PRODUCT_VERSION "0.1.0"
+!define PRODUCT_VERSION "0.1.1"
 !define PRODUCT_PUBLISHER "Docmost Desktop"
 !define PRODUCT_WEB_SITE "https://github.com/LegoPuck-orginal/docmost-desktop"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\docmost-app.exe"
@@ -13,6 +13,8 @@ RequestExecutionLevel user
 !include "MUI2.nsh"
 
 !define MUI_ABORTWARNING
+!define MUI_ICON "assets\icon.ico"
+!define MUI_UNICON "assets\icon.ico"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
@@ -44,12 +46,14 @@ Section "MainSection" SEC01
 
   ; Programmdateien
   File "target\release\docmost-app.exe"
+  CreateDirectory "$INSTDIR\assets"
+  File "/oname=assets\icon.ico" "assets\icon.ico"
 
   ; Desktop- und Startmenü-Verknüpfungen
   CreateDirectory "$SMPROGRAMS\Docmost"
-  CreateShortcut "$SMPROGRAMS\Docmost\Docmost.lnk" "$INSTDIR\docmost-app.exe"
-  CreateShortcut "$SMPROGRAMS\Docmost\Docmost Deinstallieren.lnk" "$INSTDIR\uninstall.exe"
-  CreateShortcut "$DESKTOP\Docmost.lnk" "$INSTDIR\docmost-app.exe"
+  CreateShortcut "$SMPROGRAMS\Docmost\Docmost.lnk" "$INSTDIR\docmost-app.exe" "" "$INSTDIR\assets\icon.ico" 0
+  CreateShortcut "$SMPROGRAMS\Docmost\Docmost Deinstallieren.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\assets\icon.ico" 0
+  CreateShortcut "$DESKTOP\Docmost.lnk" "$INSTDIR\docmost-app.exe" "" "$INSTDIR\assets\icon.ico" 0
 
   ; Uninstaller schreiben
   WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -58,7 +62,7 @@ Section "MainSection" SEC01
   WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\docmost-app.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\docmost-app.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\assets\icon.ico"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
@@ -69,6 +73,9 @@ Section Uninstall
   Delete "$SMPROGRAMS\Docmost\Docmost.lnk"
   Delete "$SMPROGRAMS\Docmost\Docmost Deinstallieren.lnk"
   RMDir "$SMPROGRAMS\Docmost"
+
+  Delete "$INSTDIR\assets\icon.ico"
+  RMDir "$INSTDIR\assets"
 
   Delete "$INSTDIR\docmost-app.exe"
   Delete "$INSTDIR\uninstall.exe"
