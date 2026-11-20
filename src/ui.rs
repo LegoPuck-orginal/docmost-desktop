@@ -196,6 +196,164 @@ body.has-desktop-nav {
 .docmost-btn-secondary:hover {
     background: #283049;
 }
+
+/* ===== EXCALIDRAW CLEAN DARK ENHANCEMENTS ===== */
+.excalidraw,
+.excalidraw-container,
+[data-testid="excalidraw-container"] {
+    --theme-filter: none !important;
+    --color-surface-low: #131725 !important;
+    --color-surface-mid: #191f32 !important;
+    --color-surface-high: #222a42 !important;
+    --color-surface-lowest: #0c0f18 !important;
+    --color-on-surface: #f1f5f9 !important;
+    --color-muted: #94a3b8 !important;
+    --color-border: #28314a !important;
+    --color-primary: #6366f1 !important;
+    --color-primary-darker: #4f46e5 !important;
+    --color-primary-darkest: #4338ca !important;
+    --color-primary-light: #818cf8 !important;
+    background-color: #0c0f18 !important;
+}
+
+/* Excalidraw Canvas Background */
+.excalidraw canvas,
+.excalidraw .excalidraw__canvas {
+    background-color: #0c0f18 !important;
+}
+
+/* Floating Toolbars (Island) */
+.excalidraw .Island,
+.excalidraw .App-toolbar,
+.excalidraw .layer-ui__wrapper .Island {
+    background: rgba(18, 22, 34, 0.94) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    padding: 4px 6px !important;
+}
+
+/* Excalidraw Tool Icons (Shapes, Pencil, Text, Eraser, etc.) */
+.excalidraw .ToolIcon_type_button,
+.excalidraw .ToolIcon_type_radio,
+.excalidraw .ToolIcon,
+.excalidraw button.ToolIcon {
+    border-radius: 8px !important;
+    color: #94a3b8 !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    margin: 2px !important;
+}
+
+.excalidraw .ToolIcon:hover,
+.excalidraw .ToolIcon_type_button:hover,
+.excalidraw .ToolIcon_type_radio:hover {
+    background: rgba(99, 102, 241, 0.16) !important;
+    color: #c7d2fe !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+.excalidraw .ToolIcon:active,
+.excalidraw .ToolIcon_type_button:active {
+    transform: translateY(0px) !important;
+}
+
+/* Active / Selected Tool */
+.excalidraw .ToolIcon_type_radio:checked + label .ToolIcon,
+.excalidraw .ToolIcon_type_radio:checked,
+.excalidraw .ToolIcon--selected,
+.excalidraw .ToolIcon.active,
+.excalidraw .ToolIcon[aria-pressed="true"] {
+    background: #6366f1 !important;
+    color: #ffffff !important;
+    border-color: #818cf8 !important;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.5) !important;
+}
+
+.excalidraw .ToolIcon--selected svg,
+.excalidraw .ToolIcon.active svg {
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
+}
+
+/* Excalidraw Sidebar & Properties Panel (Stroke, Fill, Color, Opacity) */
+.excalidraw .panelColumn,
+.excalidraw .sidebar-content,
+.excalidraw .layer-ui__wrapper .sidebar,
+.excalidraw .context-menu,
+.excalidraw .dropdown-menu,
+.excalidraw .popover {
+    background: #141826 !important;
+    border: 1px solid #28314a !important;
+    border-radius: 12px !important;
+    color: #f1f5f9 !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+}
+
+.excalidraw .context-menu-item,
+.excalidraw .dropdown-menu-item {
+    color: #cbd5e1 !important;
+    border-radius: 6px !important;
+    transition: all 0.12s ease !important;
+}
+
+.excalidraw .context-menu-item:hover,
+.excalidraw .dropdown-menu-item:hover {
+    background: #20273c !important;
+    color: #818cf8 !important;
+}
+
+/* Excalidraw Color Picker Palette */
+.excalidraw .color-picker,
+.excalidraw .picker {
+    background: #141826 !important;
+    border: 1px solid #28314a !important;
+    border-radius: 10px !important;
+    padding: 8px !important;
+}
+
+.excalidraw .color-picker-swatch {
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    transition: transform 0.1s ease !important;
+}
+
+.excalidraw .color-picker-swatch:hover {
+    transform: scale(1.15) !important;
+    border-color: #ffffff !important;
+}
+
+/* Bottom Controls (Zoom, Undo, Redo, Help, Zen Mode) */
+.excalidraw .layer-ui__wrapper .footer-center,
+.excalidraw .layer-ui__wrapper .footer-left,
+.excalidraw .layer-ui__wrapper .footer-right,
+.excalidraw .undo-redo-buttons,
+.excalidraw .zoom-actions {
+    background: rgba(18, 22, 34, 0.92) !important;
+    backdrop-filter: blur(14px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Modal Dialog when editing full diagram */
+.excalidraw-modal-container,
+.excalidraw .Modal,
+.excalidraw .Modal__content {
+    background: #10131e !important;
+    border: 1px solid #252b40 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8) !important;
+    color: #f1f5f9 !important;
+}
+
+.excalidraw .Modal__header {
+    border-bottom: 1px solid #20273c !important;
+}
 "#;
 
 pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
@@ -208,6 +366,23 @@ pub fn get_injection_script(server_url: &str, current_version: &str) -> String {
     const style = document.createElement('style');
     style.innerHTML = `{css}`;
     document.head.appendChild(style);
+
+    // Auto-sync Excalidraw Dark Mode
+    try {{
+        localStorage.setItem('excalidraw-theme', 'dark');
+        localStorage.setItem('excalidraw-state', JSON.stringify({{ theme: 'dark' }}));
+    }} catch (e) {{}}
+
+    const ensureExcalidrawDark = () => {{
+        document.querySelectorAll('.excalidraw').forEach(el => {{
+            if (!el.classList.contains('theme--dark')) {{
+                el.classList.add('theme--dark');
+            }}
+        }});
+    }};
+    const excalidrawObserver = new MutationObserver(ensureExcalidrawDark);
+    excalidrawObserver.observe(document.documentElement, {{ childList: true, subtree: true }});
+    ensureExcalidrawDark();
 
     // Create Navigation Bar
     const nav = document.createElement('div');
