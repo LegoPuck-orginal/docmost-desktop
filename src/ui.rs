@@ -91,6 +91,123 @@ body.has-desktop-nav {
     display: flex;
     align-items: center;
     gap: 6px;
+    user-select: none;
+}
+
+.docmost-nav-badge.clickable {
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.docmost-nav-badge.clickable:hover {
+    background: #232b42;
+    border-color: #3b486d;
+    color: #ffffff;
+}
+
+/* Server Switcher Dropdown */
+#docmost-server-dropdown {
+    position: fixed;
+    top: 42px;
+    background: #121624;
+    border: 1px solid #28314a;
+    border-radius: 10px;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.7);
+    z-index: 100000000;
+    display: none;
+    flex-direction: column;
+    min-width: 290px;
+    max-width: 350px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    animation: fadeInDropdown 0.15s ease-out;
+}
+@keyframes fadeInDropdown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.docmost-dropdown-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: #818cf8;
+    padding: 10px 14px;
+    background: #0d101a;
+    border-bottom: 1px solid #1f273d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.docmost-dropdown-list {
+    max-height: 240px;
+    overflow-y: auto;
+}
+.docmost-server-item {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid #191f32;
+    text-decoration: none;
+}
+.docmost-server-item:last-child {
+    border-bottom: none;
+}
+.docmost-server-item:hover {
+    background: #1b2236;
+}
+.docmost-server-item.active {
+    background: rgba(99, 102, 241, 0.12);
+    border-left: 3px solid #6366f1;
+}
+.docmost-server-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+.docmost-server-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.docmost-server-sub {
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.docmost-server-del-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: all 0.15s ease;
+}
+.docmost-server-del-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+.docmost-add-server-btn {
+    background: #6366f1;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.docmost-add-server-btn:hover {
+    background: #4f46e5;
 }
 
 .docmost-status-dot {
@@ -490,6 +607,10 @@ body.has-desktop-nav {
 "#;
 
 pub fn get_injection_script(config: &crate::config::AppConfig, current_version: &str) -> String {
+    let servers_json = serde_json::to_string(&config.servers).unwrap_or_else(|_| "[]".to_string());
+    let active_id = config.active_server_id.as_deref().unwrap_or("default");
+    let active_name = config.active_server().map(|s| s.name.as_str()).unwrap_or("Server");
+
     format!(r#"
 (function() {{
     if (window.__docmostDesktopInitialized) return;
@@ -505,7 +626,9 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         darkTheme: {dark_theme},
         quickToolbar: {quick_toolbar},
         zoomLevel: {zoom_level},
-        version: "{version}"
+        version: "{version}",
+        servers: {servers_json},
+        activeServerId: "{active_server_id}"
     }};
 
     // Inject CSS
@@ -575,8 +698,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             if (badge) badge.style.opacity = '1';
         }} else if (e.pointerType === 'touch' && window.__docmostConfig.palmRejection) {{
             const onCanvas = e.target.closest('.excalidraw canvas') || e.target.closest('.excalidraw');
-            // Wenn in den letzten 1200ms ein Stift aktiv war oder PenMode aktiv ist:
-            // Unterdrücke versehentliche Handballen-Touch-Zeichnungen
             if (onCanvas && (Date.now() - lastPenContactTime < 1200 || window.__docmostConfig.penMode)) {{
                 if (e.isPrimary && !e.shiftKey) {{
                     e.stopPropagation();
@@ -591,7 +712,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }}
     }}, true);
 
-    // Verhindere Windows-Stift Rechtsklick-Menü beim längeren Aufdrücken auf der Leinwand
     window.addEventListener('contextmenu', (e) => {{
         if (e.target.closest('.excalidraw canvas') || e.target.closest('.excalidraw')) {{
             e.preventDefault();
@@ -610,10 +730,12 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             <button class="docmost-nav-btn" onclick="window.location.href='{url}'" title="Startseite">🏠</button>
         </div>
         <div class="docmost-nav-group">
-            <span id="docmost-nav-url" class="docmost-nav-badge">
+            <!-- Server Switcher Badge -->
+            <div id="docmost-server-switcher-btn" class="docmost-nav-badge clickable" onclick="toggleServerDropdown(event)" title="Server wechseln">
                 <span class="docmost-status-dot"></span>
-                <span>{url_display}</span>
-            </span>
+                <span id="docmost-nav-server-name">{active_server_name}</span>
+                <span style="font-size:9px; margin-left:3px; opacity:0.8;">▼</span>
+            </div>
             <div id="docmost-update-btn" class="docmost-update-banner" onclick="openUpdateModal()">
                 <span>⬆ Update verfügbar</span>
             </div>
@@ -628,6 +750,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             document.body.prepend(nav);
             createModals();
             createPenToolbar();
+            createServerDropdown();
         }}
     }};
 
@@ -651,29 +774,191 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 <span>🧹</span><span>Radierer</span>
             </button>
             <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
-            <!-- Quick Colors -->
             <button class="docmost-color-dot" style="background:#ffffff;" onclick="setPenColor('#ffffff')" title="Weiß"></button>
             <button class="docmost-color-dot" style="background:#818cf8;" onclick="setPenColor('#818cf8')" title="Indigo"></button>
             <button class="docmost-color-dot" style="background:#34d399;" onclick="setPenColor('#34d399')" title="Smaragdgrün"></button>
             <button class="docmost-color-dot" style="background:#fbbf24;" onclick="setPenColor('#fbbf24')" title="Sonnengelb"></button>
             <button class="docmost-color-dot" style="background:#f87171;" onclick="setPenColor('#f87171')" title="Korallenrot"></button>
             <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
-            <!-- Stroke Widths -->
             <button class="docmost-pen-stroke-btn" onclick="setPenStroke(1)" title="Feine Strichstärke">―</button>
             <button class="docmost-pen-stroke-btn active" onclick="setPenStroke(2)" title="Mittlere Strichstärke">━</button>
             <button class="docmost-pen-stroke-btn" onclick="setPenStroke(4)" title="Breite Strichstärke">█</button>
             <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
-            <!-- Palm Rejection Badge -->
             <div id="badge-palm-rejection" style="font-size:11px; color:#10b981; display:flex; align-items:center; gap:4px; padding:3px 8px; background:rgba(16,185,129,0.12); border-radius:12px;" title="Handballenschutz & Stiftmodus aktiv">
                 <span>🖐️</span><span>Stift aktiv</span>
             </div>
-            <!-- Undo / Redo -->
             <button class="docmost-pen-btn" onclick="penUndo()" title="Rückgängig (Strg+Z)">↩</button>
             <button class="docmost-pen-btn" onclick="penRedo()" title="Wiederholen (Strg+Y)">↪</button>
             <button class="docmost-pen-btn" style="padding:4px 8px; color:#94a3b8;" onclick="document.getElementById('docmost-pen-toolbar').style.display='none'" title="Leiste ausblenden">✕</button>
         `;
         document.body.appendChild(tb);
     }}
+
+    function createServerDropdown() {{
+        if (document.getElementById('docmost-server-dropdown')) return;
+
+        const dd = document.createElement('div');
+        dd.id = 'docmost-server-dropdown';
+        dd.innerHTML = `
+            <div class="docmost-dropdown-header">
+                <span>GESPEICHERTE SERVER</span>
+                <button class="docmost-add-server-btn" onclick="openAddServerModal(event)">+ Neu</button>
+            </div>
+            <div id="docmost-server-dropdown-items" class="docmost-dropdown-list"></div>
+        `;
+        document.body.appendChild(dd);
+    }}
+
+    window.renderServerDropdown = function() {{
+        const container = document.getElementById('docmost-server-dropdown-items');
+        if (!container) return;
+        const servers = window.__docmostConfig.servers || [];
+        const activeId = window.__docmostConfig.activeServerId;
+
+        let html = '';
+        servers.forEach(s => {{
+            const isActive = s.id === activeId;
+            const displayUrl = s.url.replace('https://', '').replace('http://', '');
+            html += `
+                <div class="docmost-server-item ${{isActive ? 'active' : ''}}" onclick="selectServer('${{s.id}}', '${{s.url}}')">
+                    <div class="docmost-server-item-left">
+                        <span class="docmost-status-dot" style="${{isActive ? '' : 'background:#64748b; box-shadow:none;'}}"></span>
+                        <div style="overflow:hidden;">
+                            <div class="docmost-server-title">${{s.name}} ${{isActive ? '<span style="font-size:10px; color:#818cf8; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
+                            <div class="docmost-server-sub">${{displayUrl}}</div>
+                        </div>
+                    </div>
+                    ${{servers.length > 1 ? `<button class="docmost-server-del-btn" onclick="deleteServer(event, '${{s.id}}')" title="Server löschen">✕</button>` : ''}}
+                </div>
+            `;
+        }});
+        container.innerHTML = html;
+    }};
+
+    window.renderSettingsServerList = function() {{
+        const container = document.getElementById('settings-server-list');
+        if (!container) return;
+        const servers = window.__docmostConfig.servers || [];
+        const activeId = window.__docmostConfig.activeServerId;
+
+        let html = '';
+        servers.forEach(s => {{
+            const isActive = s.id === activeId;
+            const displayUrl = s.url.replace('https://', '').replace('http://', '');
+            html += `
+                <div style="padding:10px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #1c2235; ${{isActive ? 'background:rgba(99,102,241,0.12); border-left:3px solid #6366f1;' : ''}}">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="docmost-status-dot" style="${{isActive ? '' : 'background:#64748b; box-shadow:none;'}}"></span>
+                        <div>
+                            <div style="font-size:13px; font-weight:600; color:#f1f5f9;">${{s.name}} ${{isActive ? '<span style="font-size:11px; color:#10b981; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
+                            <div style="font-size:11px; color:#94a3b8;">${{displayUrl}}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        ${{!isActive ? `<button class="docmost-btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="selectServer('${{s.id}}', '${{s.url}}')">Wechseln</button>` : ''}}
+                        ${{servers.length > 1 ? `<button class="docmost-server-del-btn" onclick="deleteServer(event, '${{s.id}}')" title="Server entfernen">✕</button>` : ''}}
+                    </div>
+                </div>
+            `;
+        }});
+        container.innerHTML = html;
+    }};
+
+    window.toggleServerDropdown = function(e) {{
+        if (e) e.stopPropagation();
+        const dd = document.getElementById('docmost-server-dropdown');
+        if (!dd) return;
+        if (dd.style.display === 'flex') {{
+            dd.style.display = 'none';
+        }} else {{
+            window.renderServerDropdown();
+            const badge = document.getElementById('docmost-server-switcher-btn');
+            if (badge) {{
+                const rect = badge.getBoundingClientRect();
+                dd.style.top = (rect.bottom + 6) + 'px';
+                dd.style.right = (window.innerWidth - rect.right) + 'px';
+            }}
+            dd.style.display = 'flex';
+        }}
+    }};
+
+    window.addEventListener('click', (e) => {{
+        const dd = document.getElementById('docmost-server-dropdown');
+        if (dd && dd.style.display === 'flex') {{
+            if (!e.target.closest('#docmost-server-dropdown') && !e.target.closest('#docmost-server-switcher-btn')) {{
+                dd.style.display = 'none';
+            }}
+        }}
+    }});
+
+    window.selectServer = function(id, url) {{
+        if (id === window.__docmostConfig.activeServerId && url === window.location.href) {{
+            const dd = document.getElementById('docmost-server-dropdown');
+            if (dd) dd.style.display = 'none';
+            return;
+        }}
+        window.__docmostConfig.activeServerId = id;
+        if (window.ipc) {{
+            window.ipc.postMessage(JSON.stringify({{
+                action: 'switch_server',
+                server_id: id
+            }}));
+        }}
+        const dd = document.getElementById('docmost-server-dropdown');
+        if (dd) dd.style.display = 'none';
+        closeSettingsModal();
+        window.location.href = url;
+    }};
+
+    window.openAddServerModal = function(e) {{
+        if (e) e.stopPropagation();
+        const dd = document.getElementById('docmost-server-dropdown');
+        if (dd) dd.style.display = 'none';
+        const modal = document.getElementById('docmost-add-server-modal');
+        if (modal) modal.style.display = 'flex';
+    }};
+
+    window.closeAddServerModal = function() {{
+        const modal = document.getElementById('docmost-add-server-modal');
+        if (modal) modal.style.display = 'none';
+    }};
+
+    window.submitAddServer = function() {{
+        const nameInput = document.getElementById('input-new-server-name');
+        const urlInput = document.getElementById('input-new-server-url');
+        const name = nameInput ? nameInput.value.trim() : '';
+        let url = urlInput ? urlInput.value.trim() : '';
+        if (!url) {{
+            alert('Bitte eine gültige Server-URL eingeben.');
+            return;
+        }}
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {{
+            url = 'https://' + url;
+        }}
+        if (window.ipc) {{
+            window.ipc.postMessage(JSON.stringify({{
+                action: 'add_server',
+                server_name: name || url,
+                server_url: url
+            }}));
+        }}
+        closeAddServerModal();
+        window.location.href = url;
+    }};
+
+    window.deleteServer = function(e, id) {{
+        if (e) e.stopPropagation();
+        if (!confirm('Diesen Server wirklich aus der Liste entfernen?')) return;
+        if (window.ipc) {{
+            window.ipc.postMessage(JSON.stringify({{
+                action: 'delete_server',
+                server_id: id
+            }}));
+        }}
+        window.__docmostConfig.servers = (window.__docmostConfig.servers || []).filter(s => s.id !== id);
+        window.renderServerDropdown();
+        window.renderSettingsServerList();
+    }};
 
     window.activatePenTool = function(type) {{
         const btnPen = document.getElementById('tb-btn-pen');
@@ -707,7 +992,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 return;
             }}
         }}
-        // Fallback: update excalidraw-state in localStorage
         try {{
             const raw = localStorage.getItem('excalidraw-state');
             if (raw) {{
@@ -754,17 +1038,20 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
                     <!-- Tabs Header -->
                     <div class="docmost-tabs-header">
-                        <button id="tab-btn-general" class="docmost-tab-btn active" onclick="switchSettingsTab('general')">⚙ Allgemein</button>
+                        <button id="tab-btn-general" class="docmost-tab-btn active" onclick="switchSettingsTab('general')">⚙ Allgemein & Server</button>
                         <button id="tab-btn-pen" class="docmost-tab-btn" onclick="switchSettingsTab('pen')">🖊️ Stift & Excalidraw</button>
                         <button id="tab-btn-updates" class="docmost-tab-btn" onclick="switchSettingsTab('updates')">🔄 Updates</button>
                     </div>
 
                     <div class="docmost-modal-body" style="padding: 18px 20px;">
-                        <!-- Tab 1: Allgemein -->
+                        <!-- Tab 1: Allgemein & Server -->
                         <div id="pane-general" class="docmost-tab-pane active">
-                            <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Docmost Server URL</label>
-                            <input id="input-server-url" type="text" value="{url}" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:14px;" />
-                            
+                            <div style="font-size: 13px; font-weight:600; color:#818cf8; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>🌐 Gespeicherte Server</span>
+                                <button class="docmost-add-server-btn" onclick="openAddServerModal(event)">+ Neu</button>
+                            </div>
+                            <div id="settings-server-list" style="background:#0e111a; border:1px solid #28314a; border-radius:8px; margin-bottom:16px; overflow:hidden;"></div>
+
                             <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">GitHub Repository (für Updates)</label>
                             <input id="input-github-repo" type="text" value="{repo}" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:14px;" />
                             
@@ -773,7 +1060,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                                 <option value="0.9">90% (Kompakt)</option>
                                 <option value="1.0">100% (Standard)</option>
                                 <option value="1.1">110% (Leicht vergrößert)</option>
-                                <option value="1.25">125% (Ideal für Surface / Touch)</option>
+                                <option value="1.25">125% (Ideal für Touch / Surface)</option>
                                 <option value="1.5">150% (Sehr groß)</option>
                             </select>
                         </div>
@@ -847,6 +1134,27 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 </div>
             </div>
 
+            <!-- Add Server Modal -->
+            <div id="docmost-add-server-modal" class="docmost-modal-overlay">
+                <div class="docmost-modal-box" style="width: 420px;">
+                    <div class="docmost-modal-header">
+                        <h3 style="margin:0; font-size: 15px;">Neuen Server hinzufügen</h3>
+                        <span style="cursor:pointer; color:#94a3b8; font-size:18px;" onclick="closeAddServerModal()">✕</span>
+                    </div>
+                    <div class="docmost-modal-body">
+                        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Name / Bezeichnung</label>
+                        <input id="input-new-server-name" type="text" placeholder="z. B. Arbeit, Wiki, Test" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:14px;" />
+
+                        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Docmost Server URL</label>
+                        <input id="input-new-server-url" type="text" placeholder="https://wiki.firma.de" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px;" />
+                    </div>
+                    <div class="docmost-modal-footer">
+                        <button class="docmost-btn-secondary" onclick="closeAddServerModal()">Abbrechen</button>
+                        <button class="docmost-btn-primary" onclick="submitAddServer()">Hinzufügen & Wechseln</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Update Available Modal -->
             <div id="docmost-update-modal" class="docmost-modal-overlay">
                 <div class="docmost-modal-box">
@@ -874,17 +1182,14 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         `;
         document.body.appendChild(modalContainer);
 
-        // Pre-select Zoom in dropdown
         const zoomSelect = document.getElementById('select-ui-zoom');
         if (zoomSelect) {{
             zoomSelect.value = String(window.__docmostConfig.zoomLevel || 1.0);
         }}
 
-        // Falls bereits ein Update empfangen wurde, sofort anzeigen
         if (window.__pendingUpdateInfo) {{
             window.onUpdateAvailable(window.__pendingUpdateInfo);
         }}
-        // Backend nach anstehendem Update abfragen
         if (window.ipc) {{
             window.ipc.postMessage(JSON.stringify({{ action: 'check_pending_update' }}));
         }}
@@ -898,9 +1203,13 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         const pane = document.getElementById('pane-' + tabName);
         if (btn) btn.classList.add('active');
         if (pane) pane.classList.add('active');
+        if (tabName === 'general') {{
+            window.renderSettingsServerList();
+        }}
     }};
 
     window.openSettingsModal = function() {{
+        window.renderSettingsServerList();
         const el = document.getElementById('docmost-settings-modal');
         if (el) el.style.display = 'flex';
     }};
@@ -929,7 +1238,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
     }};
 
     window.saveSettings = function() {{
-        const urlInput = document.getElementById('input-server-url');
         const repoInput = document.getElementById('input-github-repo');
         const autoUpInput = document.getElementById('check-auto-update');
         const penModeInput = document.getElementById('check-pen-mode');
@@ -938,7 +1246,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         const darkThemeInput = document.getElementById('check-excalidraw-dark');
         const zoomSelect = document.getElementById('select-ui-zoom');
 
-        const newUrl = urlInput ? urlInput.value.trim() : '';
         const newRepo = repoInput ? repoInput.value.trim() : '';
         const autoUp = autoUpInput ? autoUpInput.checked : true;
         const penMode = penModeInput ? penModeInput.checked : true;
@@ -947,7 +1254,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         const darkTheme = darkThemeInput ? darkThemeInput.checked : true;
         const zoomLevel = zoomSelect ? parseFloat(zoomSelect.value) : 1.0;
 
-        window.__docmostConfig.serverUrl = newUrl;
         window.__docmostConfig.githubRepo = newRepo;
         window.__docmostConfig.autoUpdate = autoUp;
         window.__docmostConfig.penMode = penMode;
@@ -956,7 +1262,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         window.__docmostConfig.darkTheme = darkTheme;
         window.__docmostConfig.zoomLevel = zoomLevel;
 
-        // Apply zoom immediately
         document.documentElement.style.zoom = zoomLevel;
         checkExcalidrawPresence();
         syncExcalidrawState();
@@ -964,7 +1269,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         if (window.ipc) {{
             window.ipc.postMessage(JSON.stringify({{
                 action: 'save_settings',
-                server_url: newUrl,
                 github_repo: newRepo,
                 check_updates_on_startup: autoUp,
                 excalidraw_pen_mode: penMode,
@@ -975,9 +1279,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             }}));
         }}
         closeSettingsModal();
-        if (newUrl && newUrl !== window.location.href && newUrl !== window.__docmostConfig.serverUrl) {{
-            window.location.href = newUrl;
-        }}
     }};
 
     window.checkUpdatesManually = function() {{
@@ -1032,7 +1333,9 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
     "#,
     css = CLEAN_DARK_GLOBAL_CSS,
     url = config.server_url,
-    url_display = config.server_url.replace("https://", "").replace("http://", ""),
+    active_server_name = active_name,
+    servers_json = servers_json,
+    active_server_id = active_id,
     repo = config.github_repo,
     auto_update = config.check_updates_on_startup,
     pen_mode = config.excalidraw_pen_mode,

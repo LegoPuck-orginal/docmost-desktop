@@ -27,6 +27,8 @@ struct IpcMessage {
     excalidraw_dark_theme: Option<bool>,
     excalidraw_quick_toolbar: Option<bool>,
     ui_zoom_level: Option<f64>,
+    server_id: Option<String>,
+    server_name: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -134,6 +136,54 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             cfg.ui_zoom_level = zoom;
                         }
                         let _ = cfg.save();
+                    }
+                    "switch_server" => {
+                        let mut cfg = shared_config_for_ipc.lock().unwrap();
+                        if let Some(id) = parsed.server_id {
+                            if cfg.set_active_server(&id) {
+                                let _ = cfg.save();
+                            }
+                        }
+                    }
+                    "add_server" => {
+                        let mut cfg = shared_config_for_ipc.lock().unwrap();
+                        if let (Some(name), Some(url)) = (parsed.server_name, parsed.server_url) {
+                            let mut clean_url = url.trim().to_string();
+                            if !clean_url.starts_with("http://") && !clean_url.starts_with("https://") {
+                                clean_url = format!("https://{}", clean_url);
+                            }
+                            let id = format!("srv_{}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis());
+                            let clean_name = if name.trim().is_empty() {
+                                clean_url.replace("https://", "").replace("http://", "")
+                            } else {
+                                name.trim().to_string()
+                            };
+                            let entry = config::ServerEntry {
+                                id: id.clone(),
+                                name: clean_name,
+                                url: clean_url.clone(),
+                            };
+                            cfg.servers.push(entry);
+                            cfg.active_server_id = Some(id);
+                            cfg.server_url = clean_url;
+                            let _ = cfg.save();
+                        }
+                    }
+                    "delete_server" => {
+                        let mut cfg = shared_config_for_ipc.lock().unwrap();
+                        if let Some(id) = parsed.server_id {
+                            if cfg.servers.len() > 1 {
+                                cfg.servers.retain(|s| s.id != id);
+                                if cfg.active_server_id.as_deref() == Some(&id) {
+                                    let first_opt = cfg.servers.first().cloned();
+                                    if let Some(first) = first_opt {
+                                        cfg.active_server_id = Some(first.id);
+                                        cfg.server_url = first.url;
+                                    }
+                                }
+                                let _ = cfg.save();
+                            }
+                        }
                     }
                     "check_pending_update" => {
                         let maybe_info = pending_update_for_ipc.lock().unwrap().clone();
