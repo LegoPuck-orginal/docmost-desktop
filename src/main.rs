@@ -29,6 +29,12 @@ struct IpcMessage {
     ui_zoom_level: Option<f64>,
     server_id: Option<String>,
     server_name: Option<String>,
+    onlyoffice_url: Option<String>,
+    media_player_enabled: Option<bool>,
+    office_viewer_enabled: Option<bool>,
+    filename: Option<String>,
+    file_base64: Option<String>,
+    file_url: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -143,7 +149,40 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                         if let Some(zoom) = parsed.ui_zoom_level {
                             cfg.ui_zoom_level = zoom;
                         }
+                        if let Some(oo) = parsed.onlyoffice_url {
+                            cfg.onlyoffice_url = oo.trim().to_string();
+                        }
+                        if let Some(mp) = parsed.media_player_enabled {
+                            cfg.media_player_enabled = mp;
+                        }
+                        if let Some(ov) = parsed.office_viewer_enabled {
+                            cfg.office_viewer_enabled = ov;
+                        }
                         let _ = cfg.save();
+                    }
+                    "open_temp_file" => {
+                        if let (Some(name), Some(b64)) = (parsed.filename, parsed.file_base64) {
+                            thread::spawn(move || {
+                                use base64::Engine;
+                                let engine = base64::engine::general_purpose::STANDARD;
+                                if let Ok(bytes) = engine.decode(&b64) {
+                                    let temp_dir = std::env::temp_dir().join("DocmostApp").join("Files");
+                                    let _ = std::fs::create_dir_all(&temp_dir);
+                                    let clean_name = name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
+                                    let target = temp_dir.join(&clean_name);
+                                    if std::fs::write(&target, bytes).is_ok() {
+                                        let _ = open::that(&target);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    "open_file_external" => {
+                        if let Some(url) = parsed.file_url {
+                            thread::spawn(move || {
+                                let _ = open::that(url);
+                            });
+                        }
                     }
                     "switch_server" => {
                         let mut cfg = shared_config_for_ipc.lock().unwrap();

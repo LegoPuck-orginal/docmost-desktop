@@ -42,7 +42,7 @@ pub const CLEAN_DARK_GLOBAL_CSS: &str = r#"
     align-items: center;
     justify-content: space-between;
     padding: 0 12px;
-    z-index: 9999999;
+    z-index: 2147483640 !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 13px;
     color: #e2e8f0;
@@ -256,7 +256,7 @@ body.has-desktop-nav .mantine-AppShell-navbar {
     bottom: 0;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(4px);
-    z-index: 10000000;
+    z-index: 2147483647 !important;
     align-items: center;
     justify-content: center;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -612,6 +612,113 @@ body.has-desktop-nav .mantine-AppShell-navbar {
     color: #818cf8;
     border-color: #6366f1;
 }
+
+/* Media Player Modal */
+#docmost-media-modal .docmost-modal-box {
+    width: 860px;
+    max-width: 95vw;
+    background: #0d101a;
+    border: 1px solid #28314a;
+    border-radius: 14px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.docmost-media-content {
+    background: #070911;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    max-height: 72vh;
+    position: relative;
+    padding: 8px;
+}
+#docmost-media-video {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 8px;
+    outline: none;
+    background: #000;
+}
+.docmost-audio-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    width: 100%;
+    gap: 16px;
+}
+.docmost-audio-visual {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
+    animation: pulseGlow 2s infinite;
+}
+#docmost-media-audio {
+    width: 85%;
+    max-width: 550px;
+}
+.docmost-badge-format {
+    background: #1e2538;
+    color: #818cf8;
+    border: 1px solid #2f3956;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    text-transform: uppercase;
+}
+
+/* Office & Document Viewer Modal */
+#docmost-office-modal .docmost-modal-box {
+    width: 1040px;
+    max-width: 96vw;
+    height: 88vh;
+    background: #0e111c;
+    border: 1px solid #28314a;
+    border-radius: 14px;
+    box-shadow: 0 25px 65px rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.docmost-office-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #080a13;
+    position: relative;
+    overflow: hidden;
+}
+#docmost-office-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #111422;
+}
+.docmost-office-fallback-card {
+    margin: auto;
+    max-width: 560px;
+    padding: 36px 30px;
+    background: #121626;
+    border: 1px solid #28314a;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
 "#;
 
 pub fn get_injection_script(config: &crate::config::AppConfig, current_version: &str) -> String {
@@ -637,7 +744,10 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             zoomLevel: {zoom_level},
             version: "{version}",
             servers: {servers_json},
-            activeServerId: "{active_server_id}"
+            activeServerId: "{active_server_id}",
+            onlyofficeUrl: "{onlyoffice_url}",
+            mediaPlayerEnabled: {media_player_enabled},
+            officeViewerEnabled: {office_viewer_enabled}
         }};
 
         // Safe CSS Injection
@@ -992,6 +1102,9 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             const quickTbInput = document.getElementById('check-quick-toolbar');
             const darkThemeInput = document.getElementById('check-excalidraw-dark');
             const zoomSelect = document.getElementById('select-ui-zoom');
+            const ooInput = document.getElementById('input-onlyoffice-url');
+            const mpInput = document.getElementById('check-media-player');
+            const ovInput = document.getElementById('check-office-viewer');
 
             const newRepo = repoInput ? repoInput.value.trim() : '';
             const autoUp = autoUpInput ? autoUpInput.checked : true;
@@ -1000,6 +1113,9 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             const quickToolbar = quickTbInput ? quickTbInput.checked : true;
             const darkTheme = darkThemeInput ? darkThemeInput.checked : true;
             const zoomLevel = zoomSelect ? parseFloat(zoomSelect.value) : 1.0;
+            const onlyofficeUrl = ooInput ? ooInput.value.trim() : '';
+            const mediaPlayerEnabled = mpInput ? mpInput.checked : true;
+            const officeViewerEnabled = ovInput ? ovInput.checked : true;
 
             window.__docmostConfig.githubRepo = newRepo;
             window.__docmostConfig.autoUpdate = autoUp;
@@ -1008,6 +1124,9 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             window.__docmostConfig.quickToolbar = quickToolbar;
             window.__docmostConfig.darkTheme = darkTheme;
             window.__docmostConfig.zoomLevel = zoomLevel;
+            window.__docmostConfig.onlyofficeUrl = onlyofficeUrl;
+            window.__docmostConfig.mediaPlayerEnabled = mediaPlayerEnabled;
+            window.__docmostConfig.officeViewerEnabled = officeViewerEnabled;
 
             if (document.documentElement) {{
                 document.documentElement.style.zoom = zoomLevel;
@@ -1024,7 +1143,10 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                     excalidraw_palm_rejection: palmRejection,
                     excalidraw_quick_toolbar: quickToolbar,
                     excalidraw_dark_theme: darkTheme,
-                    ui_zoom_level: zoomLevel
+                    ui_zoom_level: zoomLevel,
+                    onlyoffice_url: onlyofficeUrl,
+                    media_player_enabled: mediaPlayerEnabled,
+                    office_viewer_enabled: officeViewerEnabled
                 }}));
             }}
             window.closeSettingsModal();
@@ -1078,6 +1200,251 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 }}));
             }}
         }};
+
+        // Media Player Logic
+        let currentMediaUrl = '';
+        let currentMediaTitle = '';
+
+        window.openMediaPlayer = function(url, title) {{
+            currentMediaUrl = url;
+            currentMediaTitle = title || url.split('/').pop().split('?')[0] || 'Mediendatei';
+
+            const modal = document.getElementById('docmost-media-modal');
+            const titleEl = document.getElementById('media-modal-title');
+            const badgeEl = document.getElementById('media-modal-badge');
+            const videoEl = document.getElementById('docmost-media-video');
+            const audioEl = document.getElementById('docmost-media-audio');
+            const audioView = document.getElementById('docmost-audio-view');
+            const videoContainer = document.getElementById('docmost-video-container');
+
+            if (!modal) return;
+            if (titleEl) titleEl.innerText = currentMediaTitle;
+
+            const ext = (currentMediaTitle.split('.').pop() || '').toLowerCase();
+            if (badgeEl) badgeEl.innerText = ext ? ext.toUpperCase() : 'MEDIA';
+
+            const isAudio = ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac'].includes(ext);
+
+            if (isAudio) {{
+                if (videoContainer) videoContainer.style.display = 'none';
+                if (videoEl) {{ videoEl.pause(); videoEl.src = ''; }}
+                if (audioView) audioView.style.display = 'flex';
+                if (audioEl) {{
+                    audioEl.src = url;
+                    audioEl.play().catch(() => {{}});
+                }}
+            }} else {{
+                if (audioView) audioView.style.display = 'none';
+                if (audioEl) {{ audioEl.pause(); audioEl.src = ''; }}
+                if (videoContainer) videoContainer.style.display = 'flex';
+                if (videoEl) {{
+                    videoEl.src = url;
+                    videoEl.play().catch(() => {{}});
+                }}
+            }}
+            modal.style.display = 'flex';
+        }};
+
+        window.closeMediaPlayer = function() {{
+            const modal = document.getElementById('docmost-media-modal');
+            const videoEl = document.getElementById('docmost-media-video');
+            const audioEl = document.getElementById('docmost-media-audio');
+            if (videoEl) {{ videoEl.pause(); videoEl.src = ''; }}
+            if (audioEl) {{ audioEl.pause(); audioEl.src = ''; }}
+            if (modal) modal.style.display = 'none';
+        }};
+
+        window.openCurrentMediaExternal = function() {{
+            if (currentMediaUrl) {{
+                window.downloadAndOpenExternal(currentMediaUrl, currentMediaTitle);
+            }}
+        }};
+
+        // Office & Document Logic
+        let currentOfficeUrl = '';
+        let currentOfficeTitle = '';
+
+        window.openOfficeModal = function(url, title) {{
+            currentOfficeUrl = url;
+            currentOfficeTitle = title || url.split('/').pop().split('?')[0] || 'Dokument';
+
+            const modal = document.getElementById('docmost-office-modal');
+            const titleEl = document.getElementById('office-modal-title');
+            const badgeEl = document.getElementById('office-modal-badge');
+            const iframe = document.getElementById('docmost-office-iframe');
+            const fallbackCard = document.getElementById('docmost-office-fallback-card');
+            const fallbackIcon = document.getElementById('office-fallback-icon');
+            const fallbackName = document.getElementById('office-fallback-filename');
+
+            if (!modal) return;
+            if (titleEl) titleEl.innerText = currentOfficeTitle;
+            if (fallbackName) fallbackName.innerText = currentOfficeTitle;
+
+            const ext = (currentOfficeTitle.split('.').pop() || '').toLowerCase();
+            if (badgeEl) badgeEl.innerText = ext ? ext.toUpperCase() : 'DOC';
+
+            if (fallbackIcon) {{
+                if (['docx', 'doc', 'odt'].includes(ext)) {{
+                    fallbackIcon.innerText = '📝';
+                }} else if (['pptx', 'ppt', 'odp'].includes(ext)) {{
+                    fallbackIcon.innerText = '📊';
+                }} else if (['xlsx', 'xls', 'ods', 'csv'].includes(ext)) {{
+                    fallbackIcon.innerText = '📈';
+                }} else if (ext === 'pdf') {{
+                    fallbackIcon.innerText = '📄';
+                }} else {{
+                    fallbackIcon.innerText = '📁';
+                }}
+            }}
+
+            const onlyofficeConfigUrl = (window.__docmostConfig.onlyofficeUrl || '').trim();
+
+            if (ext === 'pdf') {{
+                if (fallbackCard) fallbackCard.style.display = 'none';
+                if (iframe) {{
+                    iframe.style.display = 'block';
+                    iframe.src = url;
+                }}
+            }} else if (onlyofficeConfigUrl) {{
+                let ooEmbed = onlyofficeConfigUrl;
+                if (!ooEmbed.endsWith('/')) ooEmbed += '/';
+                const fullFileUrl = url.startsWith('http') ? url : (window.location.origin + (url.startsWith('/') ? '' : '/') + url);
+                const ooViewerUrl = ooEmbed + 'web-apps/apps/documenteditor/main/index.html?mode=view&url=' + encodeURIComponent(fullFileUrl);
+                if (fallbackCard) fallbackCard.style.display = 'none';
+                if (iframe) {{
+                    iframe.style.display = 'block';
+                    iframe.src = ooViewerUrl;
+                }}
+            }} else {{
+                if (iframe) {{
+                    iframe.style.display = 'none';
+                    iframe.src = 'about:blank';
+                }}
+                if (fallbackCard) fallbackCard.style.display = 'flex';
+            }}
+
+            modal.style.display = 'flex';
+        }};
+
+        window.closeOfficeModal = function() {{
+            const modal = document.getElementById('docmost-office-modal');
+            const iframe = document.getElementById('docmost-office-iframe');
+            if (iframe) iframe.src = 'about:blank';
+            if (modal) modal.style.display = 'none';
+        }};
+
+        window.openCurrentOfficeExternal = function() {{
+            if (currentOfficeUrl) {{
+                window.downloadAndOpenExternal(currentOfficeUrl, currentOfficeTitle);
+            }}
+        }};
+
+        window.toggleOfficeOnlineViewer = function() {{
+            const iframe = document.getElementById('docmost-office-iframe');
+            const fallbackCard = document.getElementById('docmost-office-fallback-card');
+            if (!iframe) return;
+
+            const fullFileUrl = currentOfficeUrl.startsWith('http') ? currentOfficeUrl : (window.location.origin + (currentOfficeUrl.startsWith('/') ? '' : '/') + currentOfficeUrl);
+            const msOnlineUrl = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(fullFileUrl);
+
+            if (fallbackCard) fallbackCard.style.display = 'none';
+            iframe.style.display = 'block';
+            iframe.src = msOnlineUrl;
+        }};
+
+        // Helper to download authenticated file and trigger native local application
+        window.downloadAndOpenExternal = async function(url, filename) {{
+            const btn = document.activeElement;
+            const originalText = btn ? btn.innerText : '';
+            if (btn && btn.tagName === 'BUTTON') {{
+                btn.disabled = true;
+                btn.innerText = '⏳ Öffne in lokaler App...';
+            }}
+            try {{
+                const res = await fetch(url, {{ credentials: 'include' }});
+                if (!res.ok) throw new Error('Download-Status: ' + res.status);
+                const blob = await res.blob();
+                const reader = new FileReader();
+                reader.onloadend = function() {{
+                    const base64data = reader.result.split(',')[1];
+                    if (window.ipc) {{
+                        window.ipc.postMessage(JSON.stringify({{
+                            action: 'open_temp_file',
+                            filename: filename,
+                            file_base64: base64data
+                        }}));
+                    }}
+                    setTimeout(() => {{
+                        if (btn && btn.tagName === 'BUTTON') {{
+                            btn.disabled = false;
+                            btn.innerText = originalText;
+                        }}
+                    }}, 1200);
+                }};
+                reader.readAsDataURL(blob);
+            }} catch (err) {{
+                console.warn('[Docmost Desktop] Fetch failed, falling back to direct URL launch:', err);
+                if (window.ipc) {{
+                    window.ipc.postMessage(JSON.stringify({{
+                        action: 'open_file_external',
+                        file_url: url.startsWith('http') ? url : (window.location.origin + (url.startsWith('/') ? '' : '/') + url)
+                    }}));
+                }}
+                if (btn && btn.tagName === 'BUTTON') {{
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }}
+            }}
+        }};
+
+        // Global Click Interceptor for Media and Office Attachments
+        document.addEventListener('click', (e) => {{
+            const link = e.target.closest('a');
+            if (!link) return;
+            const href = link.getAttribute('href') || '';
+            const download = link.getAttribute('download') || '';
+            const text = (link.innerText || '').trim();
+
+            if (!href || href.startsWith('javascript:') || href.startsWith('#')) return;
+
+            const cleanHref = href.split('?')[0].split('#')[0].toLowerCase();
+            const linkTextLower = text.toLowerCase();
+            const downloadLower = download.toLowerCase();
+
+            const mediaExts = ['.mp4', '.webm', '.mov', '.mkv', '.m4v', '.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac'];
+            const officeExts = ['.docx', '.doc', '.pptx', '.ppt', '.xlsx', '.xls', '.odt', '.ods', '.odp', '.pdf'];
+
+            const isMedia = mediaExts.some(ext => cleanHref.endsWith(ext) || linkTextLower.endsWith(ext) || downloadLower.endsWith(ext));
+            const isOffice = officeExts.some(ext => cleanHref.endsWith(ext) || linkTextLower.endsWith(ext) || downloadLower.endsWith(ext));
+
+            if (isMedia && window.__docmostConfig.mediaPlayerEnabled) {{
+                e.preventDefault();
+                e.stopPropagation();
+                const displayName = download || text || href.split('/').pop().split('?')[0] || 'Mediendatei';
+                window.openMediaPlayer(href, displayName);
+            }} else if (isOffice && window.__docmostConfig.officeViewerEnabled) {{
+                e.preventDefault();
+                e.stopPropagation();
+                const displayName = download || text || href.split('/').pop().split('?')[0] || 'Dokument';
+                window.openOfficeModal(href, displayName);
+            }}
+        }}, true);
+
+        // Keyboard shortcuts
+        window.addEventListener('keydown', (e) => {{
+            if (e.key === 'Escape') {{
+                const mediaModal = document.getElementById('docmost-media-modal');
+                if (mediaModal && mediaModal.style.display === 'flex') {{
+                    window.closeMediaPlayer();
+                    return;
+                }}
+                const officeModal = document.getElementById('docmost-office-modal');
+                if (officeModal && officeModal.style.display === 'flex') {{
+                    window.closeOfficeModal();
+                    return;
+                }}
+            }}
+        }});
 
         // Factory Functions for DOM elements
         function createNavElement() {{
@@ -1169,6 +1536,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                         <div class="docmost-tabs-header">
                             <button id="tab-btn-general" class="docmost-tab-btn active" onclick="window.switchSettingsTab('general')">⚙ Allgemein & Server</button>
                             <button id="tab-btn-pen" class="docmost-tab-btn" onclick="window.switchSettingsTab('pen')">🖊️ Stift & Excalidraw</button>
+                            <button id="tab-btn-office" class="docmost-tab-btn" onclick="window.switchSettingsTab('office')">📄 Office & Medien</button>
                             <button id="tab-btn-updates" class="docmost-tab-btn" onclick="window.switchSettingsTab('updates')">🔄 Updates</button>
                         </div>
 
@@ -1233,6 +1601,35 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                                         </div>
                                     </label>
                                 </div>
+                            </div>
+
+                            <!-- Tab 4: Office & Medien -->
+                            <div id="pane-office" class="docmost-tab-pane">
+                                <div style="font-size: 13px; font-weight:600; color:#818cf8; margin-bottom: 12px; display:flex; align-items:center; gap:6px;">
+                                    <span>📄</span><span>OnlyOffice &amp; Integrierter Medienplayer</span>
+                                </div>
+
+                                <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:14px;">
+                                    <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
+                                        <input id="check-media-player" type="checkbox" {checked_media_player} style="margin-top:2px;" />
+                                        <div>
+                                            <div style="font-weight:600; color:#f1f5f9;">Integrierter Video- &amp; Audio-Player</div>
+                                            <div style="font-size:11px; color:#94a3b8;">Spielt Videos (MP4, WebM, MOV) und Audiodateien (MP3, WAV, M4A) direkt in der Desktop-App ab.</div>
+                                        </div>
+                                    </label>
+
+                                    <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
+                                        <input id="check-office-viewer" type="checkbox" {checked_office_viewer} style="margin-top:2px;" />
+                                        <div>
+                                            <div style="font-weight:600; color:#f1f5f9;">Office- &amp; Dokumenten-Viewer</div>
+                                            <div style="font-size:11px; color:#94a3b8;">Ermöglicht das Öffnen von Word-, PowerPoint- &amp; Excel-Dateien mit 1 Klick in Ihrer lokalen Office-App oder OnlyOffice.</div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">OnlyOffice Document Server URL (optional)</label>
+                                <input id="input-onlyoffice-url" type="text" value="{onlyoffice_url}" placeholder="https://onlyoffice.meinedomain.de" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:6px;" />
+                                <div style="font-size:11px; color:#64748b;">Falls Sie einen OnlyOffice Document Server betreiben, können Dokumente direkt im Viewer eingebettet bearbeitet werden.</div>
                             </div>
 
                             <!-- Tab 3: Updates -->
@@ -1305,6 +1702,69 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                         <div class="docmost-modal-footer">
                             <button class="docmost-btn-secondary" onclick="window.closeUpdateModal()">Später</button>
                             <button id="btn-do-update" class="docmost-btn-primary" onclick="window.performUpdate()">Jetzt herunterladen & installieren</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Player Modal -->
+                <div id="docmost-media-modal" class="docmost-modal-overlay">
+                    <div class="docmost-modal-box">
+                        <div class="docmost-modal-header">
+                            <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                                <span class="docmost-badge-format" id="media-modal-badge">MEDIA</span>
+                                <h3 style="margin:0; font-size: 15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:600px;" id="media-modal-title">Mediendatei</h3>
+                            </div>
+                            <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="window.closeMediaPlayer()">✕</span>
+                        </div>
+                        <div class="docmost-media-content">
+                            <div id="docmost-video-container" style="display:flex; justify-content:center; align-items:center; width:100%;">
+                                <video id="docmost-media-video" controls></video>
+                            </div>
+                            <div id="docmost-audio-view" class="docmost-audio-view" style="display:none;">
+                                <div class="docmost-audio-visual">🎵</div>
+                                <audio id="docmost-media-audio" controls></audio>
+                            </div>
+                        </div>
+                        <div class="docmost-modal-footer">
+                            <button class="docmost-btn-secondary" onclick="window.openCurrentMediaExternal()" title="In lokalem Standard-Player (z. B. VLC) öffnen">In Standard-Player öffnen ↗</button>
+                            <button class="docmost-btn-secondary" onclick="window.closeMediaPlayer()">Schließen</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Office & Document Viewer Modal -->
+                <div id="docmost-office-modal" class="docmost-modal-overlay">
+                    <div class="docmost-modal-box">
+                        <div class="docmost-modal-header">
+                            <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                                <span class="docmost-badge-format" id="office-modal-badge">DOC</span>
+                                <h3 style="margin:0; font-size: 15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:680px;" id="office-modal-title">Dokument</h3>
+                            </div>
+                            <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="window.closeOfficeModal()">✕</span>
+                        </div>
+                        <div class="docmost-office-body">
+                            <iframe id="docmost-office-iframe" style="display:none;"></iframe>
+                            <div id="docmost-office-fallback-card" class="docmost-office-fallback-card">
+                                <div id="office-fallback-icon" style="font-size:48px;">📄</div>
+                                <div>
+                                    <div id="office-fallback-filename" style="font-size:16px; font-weight:700; color:#f1f5f9; margin-bottom:6px;">Dokument</div>
+                                    <div style="font-size:13px; color:#94a3b8; max-width:440px; line-height:1.4;">
+                                        Öffnen Sie diese Office-Datei mit einem Klick in Ihrer lokal installierten Office-Suite (Microsoft Word, PowerPoint, Excel oder OnlyOffice Desktop).
+                                    </div>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:320px; margin-top:8px;">
+                                    <button class="docmost-btn-primary" style="padding:10px 18px; font-size:14px;" onclick="window.openCurrentOfficeExternal()">
+                                        ⚡ In lokaler Office-App öffnen
+                                    </button>
+                                    <button class="docmost-btn-secondary" style="padding:8px 14px; font-size:12px;" onclick="window.toggleOfficeOnlineViewer()">
+                                        🌐 In Office Online Web-Vorschau ansehen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="docmost-modal-footer">
+                            <button class="docmost-btn-secondary" onclick="window.openCurrentOfficeExternal()" title="In lokaler Word / PowerPoint / Excel / OnlyOffice App öffnen">In lokaler Office-App öffnen ↗</button>
+                            <button class="docmost-btn-secondary" onclick="window.closeOfficeModal()">Schließen</button>
                         </div>
                     </div>
                 </div>
@@ -1410,7 +1870,12 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
     checked_palm_rejection = if config.excalidraw_palm_rejection { "checked" } else { "" },
     checked_quick_toolbar = if config.excalidraw_quick_toolbar { "checked" } else { "" },
     checked_dark_theme = if config.excalidraw_dark_theme { "checked" } else { "" },
-    checked_auto_up = if config.check_updates_on_startup { "checked" } else { "" }
+    checked_auto_up = if config.check_updates_on_startup { "checked" } else { "" },
+    onlyoffice_url = config.onlyoffice_url,
+    media_player_enabled = config.media_player_enabled,
+    office_viewer_enabled = config.office_viewer_enabled,
+    checked_media_player = if config.media_player_enabled { "checked" } else { "" },
+    checked_office_viewer = if config.office_viewer_enabled { "checked" } else { "" }
     )
 }
 
@@ -1595,9 +2060,13 @@ mod tests {
     #[test]
     fn test_injection_script_output() {
         let cfg = crate::config::AppConfig::default();
-        let script = get_injection_script(&cfg, "0.1.5");
+        let script = get_injection_script(&cfg, "0.1.7");
         let _ = std::fs::write("target/test_injection.js", &script);
         assert!(script.contains("docmost-desktop-nav"));
         assert!(script.contains("docmost-server-switcher-btn"));
+        assert!(script.contains("docmost-media-modal"));
+        assert!(script.contains("docmost-office-modal"));
+        assert!(script.contains("openMediaPlayer"));
+        assert!(script.contains("openOfficeModal"));
     }
 }

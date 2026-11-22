@@ -1,6 +1,6 @@
 [package]
 name = "docmost-app"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 authors = ["Docmost Desktop"]
 description = "Docmost Desktop Client with Clean Dark Design and Auto-Updater"
@@ -14,6 +14,7 @@ semver = "1.0"
 ureq = { version = "2.10", features = ["json", "tls"] }
 dirs = "5.0"
 open = "5.3"
+base64 = "0.22"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = [

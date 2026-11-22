@@ -57,6 +57,16 @@ pub struct AppConfig {
     pub servers: Vec<ServerEntry>,
     #[serde(default = "default_active_server_id")]
     pub active_server_id: Option<String>,
+    #[serde(default = "default_empty_string")]
+    pub onlyoffice_url: String,
+    #[serde(default = "default_true")]
+    pub media_player_enabled: bool,
+    #[serde(default = "default_true")]
+    pub office_viewer_enabled: bool,
+}
+
+fn default_empty_string() -> String {
+    String::new()
 }
 
 impl Default for AppConfig {
@@ -76,6 +86,9 @@ impl Default for AppConfig {
             ui_zoom_level: 1.0,
             servers: default_servers(),
             active_server_id: default_active_server_id(),
+            onlyoffice_url: String::new(),
+            media_player_enabled: true,
+            office_viewer_enabled: true,
         }
     }
 }
