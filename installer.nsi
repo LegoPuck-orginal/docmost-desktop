@@ -46,6 +46,7 @@ Section "MainSection" SEC01
 
   ; Programmdateien
   File "target\release\docmost-app.exe"
+  File "assets\WebView2Loader.dll"
   CreateDirectory "$INSTDIR\assets"
   File "/oname=assets\icon.ico" "assets\icon.ico"
 
@@ -78,6 +79,7 @@ Section Uninstall
   RMDir "$INSTDIR\assets"
 
   Delete "$INSTDIR\docmost-app.exe"
+  Delete "$INSTDIR\WebView2Loader.dll"
   Delete "$INSTDIR\uninstall.exe"
   RMDir "$INSTDIR"
 
