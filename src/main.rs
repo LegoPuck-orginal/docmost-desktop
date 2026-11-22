@@ -92,6 +92,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let injection_script = ui::get_injection_script(&config, current_version);
 
     let mut builder = WebViewBuilder::new_with_web_context(&mut web_context)
+        .with_devtools(true)
         .with_initialization_script(&injection_script);
 
     if config.server_url.trim().is_empty() {

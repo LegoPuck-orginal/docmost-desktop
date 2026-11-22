@@ -421,7 +421,7 @@ dependencies = [
 
 [[package]]
 name = "docmost-app"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "dirs 5.0.1",
  "open",
