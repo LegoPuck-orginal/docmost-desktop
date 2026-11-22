@@ -52,6 +52,7 @@ pub const CLEAN_DARK_GLOBAL_CSS: &str = r#"
 
 body.has-desktop-nav {
     padding-top: 38px !important;
+    box-sizing: border-box !important;
 }
 body.has-desktop-nav header,
 body.has-desktop-nav .mantine-AppShell-header {
@@ -729,8 +730,32 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
     format!(r#"
 (function() {{
     try {{
+        if (window.top !== window.self) return;
         if (window.__docmostDesktopInitialized) return;
         window.__docmostDesktopInitialized = true;
+
+        // Diagnostic IPC forwarder
+        function logToRust(level, msg) {{
+            try {{
+                if (window.ipc) {{
+                    window.ipc.postMessage(JSON.stringify({{
+                        action: 'console_log',
+                        level: level,
+                        message: String(msg)
+                    }}));
+                }}
+            }} catch (e) {{}}
+        }}
+
+        logToRust('info', 'Docmost Desktop Script initialized at: ' + window.location.href);
+
+        window.addEventListener('error', function(e) {{
+            logToRust('error', (e.message || 'Error') + ' at ' + (e.filename || '') + ':' + (e.lineno || ''));
+        }});
+
+        window.addEventListener('unhandledrejection', function(e) {{
+            logToRust('unhandledrejection', e.reason ? (e.reason.stack || e.reason.message || String(e.reason)) : 'Promise rejected');
+        }});
 
         // Config State
         window.__docmostConfig = {{
@@ -768,8 +793,10 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             }}
         }};
 
-        // Auto-sync Excalidraw Dark Mode & Pen Mode
+        // Auto-sync Excalidraw Dark Mode & Pen Mode (runs only when Excalidraw is present)
         const syncExcalidrawState = () => {{
+            const hasExcalidraw = !!document.querySelector('.excalidraw, [data-testid="excalidraw-container"]');
+            if (!hasExcalidraw) return;
             try {{
                 const rawState = localStorage.getItem('excalidraw-state');
                 let state = rawState ? JSON.parse(rawState) : {{}};
@@ -1779,7 +1806,8 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             if (window.__pendingUpdateInfo) {{
                 window.onUpdateAvailable(window.__pendingUpdateInfo);
             }}
-            if (window.ipc) {{
+            if (!window.__hasCheckedUpdateOnInit && window.ipc) {{
+                window.__hasCheckedUpdateOnInit = true;
                 window.ipc.postMessage(JSON.stringify({{ action: 'check_pending_update' }}));
             }}
         }}
@@ -1820,6 +1848,12 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             }}
         }}
 
+        let uiDebounceTimer = null;
+        function debouncedEnsureDesktopUI() {{
+            if (uiDebounceTimer) clearTimeout(uiDebounceTimer);
+            uiDebounceTimer = setTimeout(ensureDesktopUI, 80);
+        }}
+
         // Trigger on all relevant phases
         ensureDesktopUI();
 
@@ -1828,12 +1862,26 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }}
         window.addEventListener('load', ensureDesktopUI);
 
-        // Persistent observer on document tree
+        // Persistent observer on document tree with intelligent debouncing
         try {{
-            const observer = new MutationObserver(() => {{
-                ensureDesktopUI();
+            const observer = new MutationObserver((mutations) => {{
+                let ignore = true;
+                for (let i = 0; i < mutations.length; i++) {{
+                    const t = mutations[i].target;
+                    if (!t || (t.id !== 'docmost-desktop-nav' && t.id !== 'docmost-desktop-modals' && !t.closest?.('#docmost-desktop-modals, #docmost-desktop-nav, #docmost-server-dropdown, #docmost-pen-toolbar'))) {{
+                        ignore = false;
+                        break;
+                    }}
+                }}
+                if (!ignore) {{
+                    debouncedEnsureDesktopUI();
+                }}
             }});
-            observer.observe(document, {{ childList: true, subtree: true }});
+            if (document.body) {{
+                observer.observe(document.body, {{ childList: true, subtree: true }});
+            }} else if (document.documentElement) {{
+                observer.observe(document.documentElement, {{ childList: true, subtree: true }});
+            }}
         }} catch (obsErr) {{
             console.error("[Docmost Desktop] MutationObserver error:", obsErr);
         }}

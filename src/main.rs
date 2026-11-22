@@ -18,6 +18,8 @@ use wry::{WebContext, WebViewBuilder};
 #[derive(serde::Deserialize)]
 struct IpcMessage {
     action: String,
+    level: Option<String>,
+    message: Option<String>,
     server_url: Option<String>,
     github_repo: Option<String>,
     check_updates_on_startup: Option<bool>,
@@ -88,8 +90,8 @@ fn check_single_instance() -> Option<windows_sys::Win32::Foundation::HANDLE> {
             if !hwnd.is_null() {
                 ShowWindow(hwnd, SW_RESTORE);
                 SetForegroundWindow(hwnd);
+                return None;
             }
-            return None;
         }
         Some(handle)
     }
@@ -169,6 +171,27 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut builder = WebViewBuilder::new_with_web_context(&mut web_context)
         .with_devtools(true)
         .with_initialization_script(&injection_script);
+
+    #[cfg(windows)]
+    {
+        use wry::WebViewBuilderExtWindows;
+        builder = builder.with_additional_browser_args(
+            "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --autoplay-policy=no-user-gesture-required --disable-gpu-compositing"
+        );
+    }
+
+    builder = builder.with_on_page_load_handler(|event, url| {
+        let evt_str = match event {
+            wry::PageLoadEvent::Started => "Started",
+            wry::PageLoadEvent::Finished => "Finished",
+        };
+        let log_file = std::env::temp_dir().join("docmost_navigation.log");
+        let line = format!("[Navigation {}] {}\n", evt_str, url);
+        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(log_file) {
+            use std::io::Write;
+            let _ = write!(f, "{}", line);
+        }
+    });
 
     if config.server_url.trim().is_empty() {
         builder = builder.with_html(ui::get_offline_or_setup_html(&config.server_url, current_version, None));
@@ -330,6 +353,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                     "open_external" => {
                         if let Some(url) = parsed.server_url {
                             let _ = open::that(url);
+                        }
+                    }
+                    "console_log" => {
+                        let log_file = std::env::temp_dir().join("docmost_console.log");
+                        let line = format!("[JS {:?}] {}\n", parsed.level.as_deref().unwrap_or("log"), parsed.message.as_deref().unwrap_or(""));
+                        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(log_file) {
+                            use std::io::Write;
+                            let _ = write!(f, "{}", line);
                         }
                     }
                     _ => {}
