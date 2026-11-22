@@ -43,11 +43,72 @@ enum UserEvent {
     UpdateCheckFinished(String),
 }
 
+#[cfg(windows)]
+fn show_error_box(msg: &str) {
+    use std::ffi::OsStr;
+    use std::os::windows::ffi::OsStrExt;
+    use windows_sys::Win32::UI::WindowsAndMessaging::{MessageBoxW, MB_ICONERROR, MB_OK};
+
+    let title: Vec<u16> = OsStr::new("Docmost Desktop - Fehler")
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect();
+    let message: Vec<u16> = OsStr::new(msg)
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect();
+    unsafe {
+        MessageBoxW(0 as _, message.as_ptr(), title.as_ptr(), MB_OK | MB_ICONERROR);
+    }
+}
+
+#[cfg(windows)]
+fn check_single_instance() -> Option<windows_sys::Win32::Foundation::HANDLE> {
+    use std::ffi::OsStr;
+    use std::os::windows::ffi::OsStrExt;
+    use windows_sys::Win32::Foundation::{ERROR_ALREADY_EXISTS, GetLastError, HANDLE};
+    use windows_sys::Win32::System::Threading::CreateMutexW;
+    use windows_sys::Win32::UI::WindowsAndMessaging::{
+        FindWindowW, SetForegroundWindow, ShowWindow, SW_RESTORE,
+    };
+
+    let mutex_name: Vec<u16> = OsStr::new("Local\\DocmostDesktopSingleInstanceMutex")
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect();
+
+    unsafe {
+        let handle: HANDLE = CreateMutexW(std::ptr::null(), 1, mutex_name.as_ptr());
+        if !handle.is_null() && GetLastError() == ERROR_ALREADY_EXISTS {
+            let window_title: Vec<u16> = OsStr::new("Docmost")
+                .encode_wide()
+                .chain(std::iter::once(0))
+                .collect();
+            let hwnd = FindWindowW(std::ptr::null(), window_title.as_ptr());
+            if !hwnd.is_null() {
+                ShowWindow(hwnd, SW_RESTORE);
+                SetForegroundWindow(hwnd);
+            }
+            return None;
+        }
+        Some(handle)
+    }
+}
+
 fn main() {
+    #[cfg(windows)]
+    let _instance_mutex = match check_single_instance() {
+        Some(handle) => handle,
+        None => return, // Bereits eine Instanz aktiv und nach vorne geholt
+    };
+
     if let Err(e) = run() {
         let log_path = std::env::temp_dir().join("docmost_startup_error.log");
-        let _ = std::fs::write(&log_path, format!("Fatal Error: {:?}\n", e));
-        eprintln!("Fatal error: {:?}", e);
+        let err_text = format!("Docmost konnte nicht gestartet werden:\n\n{:?}", e);
+        let _ = std::fs::write(&log_path, &err_text);
+        #[cfg(windows)]
+        show_error_box(&err_text);
+        eprintln!("{}", err_text);
     }
 }
 
