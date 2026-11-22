@@ -37,7 +37,14 @@ enum UserEvent {
     UpdateCheckFinished(String),
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
+    if let Err(e) = run() {
+        let _ = std::fs::write("startup_error.log", format!("Error: {:?}", e));
+        eprintln!("Fatal error: {:?}", e);
+    }
+}
+
+fn run() -> Result<(), Box<dyn std::error::Error>> {
     let config = AppConfig::load();
     let current_version = env!("CARGO_PKG_VERSION");
 
