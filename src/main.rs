@@ -45,7 +45,8 @@ enum UserEvent {
 
 fn main() {
     if let Err(e) = run() {
-        let _ = std::fs::write("startup_error.log", format!("Error: {:?}", e));
+        let log_path = std::env::temp_dir().join("docmost_startup_error.log");
+        let _ = std::fs::write(&log_path, format!("Fatal Error: {:?}\n", e));
         eprintln!("Fatal error: {:?}", e);
     }
 }
