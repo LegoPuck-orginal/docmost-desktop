@@ -29,124 +29,75 @@ pub const CLEAN_DARK_GLOBAL_CSS: &str = r#"
     background: #363f5c;
 }
 
-/* Injected Minimalist Dark Top Bar (Identical to Docmost Header) */
-#docmost-desktop-nav {
+/* Floating 3-Line Hamburger Menu Button (Top Right, Docmost Mantine Style) */
+#docmost-app-menu-btn {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 36px;
-    background: #1f1f1f;
-    border-bottom: 1px solid #2e2e2e;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    z-index: 2147483640 !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 13px;
-    color: #c9c9c9;
-    user-select: none;
-    box-sizing: border-box !important;
-}
-
-body.has-desktop-nav {
-    padding-top: 36px !important;
-    box-sizing: border-box !important;
-}
-body.has-desktop-nav header,
-body.has-desktop-nav .mantine-AppShell-header {
-    top: 36px !important;
-}
-body.has-desktop-nav .mantine-AppShell-navbar {
-    top: 36px !important;
-    height: calc(100vh - 36px) !important;
-}
-
-.docmost-nav-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* Docmost Desktop Menu Trigger Button */
-.docmost-menu-trigger-btn {
-    background: transparent;
-    border: none;
-    color: #c9c9c9;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: background-color 0.12s ease, color 0.12s ease;
-    user-select: none;
-}
-.docmost-menu-trigger-btn:hover,
-.docmost-menu-trigger-btn.active {
-    background: #2e2e2e;
-    color: #ffffff;
-}
-
-/* Brand Glyph [D] */
-.docmost-brand-badge {
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(135deg, #228be6, #7950f2);
-    border-radius: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    font-weight: 800;
-    font-size: 11px;
-    box-shadow: 0 2px 6px rgba(34, 139, 230, 0.4);
-}
-
-/* Mantine ActionIcon Style Buttons */
-.docmost-icon-btn {
-    width: 28px;
-    height: 28px;
-    background: transparent;
-    border: none;
-    border-radius: 4px;
-    color: #828282;
-    cursor: pointer;
-    font-size: 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.12s ease, color 0.12s ease;
-    user-select: none;
-}
-.docmost-icon-btn:hover {
-    background: #2e2e2e;
-    color: #ffffff;
-}
-.docmost-icon-btn:active {
-    background: #242424;
-}
-
-/* Server Pill Button (Matches Docmost Workspace Selector) */
-.docmost-server-pill {
-    background: #242424;
-    color: #c9c9c9;
+    top: 8px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background: rgba(31, 31, 31, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid #383838;
-    border-radius: 16px;
-    padding: 3px 10px;
-    font-size: 12px;
-    font-weight: 500;
+    border-radius: 6px;
+    color: #c9c9c9;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
-    cursor: pointer;
+    justify-content: center;
+    z-index: 2147483645 !important;
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
     user-select: none;
-    transition: all 0.12s ease;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
-.docmost-server-pill:hover {
+#docmost-app-menu-btn:hover,
+#docmost-app-menu-btn.active {
+    background: #2e2e2e;
+    border-color: #4a4a4a;
+    color: #ffffff;
+}
+#docmost-menu-update-dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #228be6;
+    box-shadow: 0 0 6px rgba(34, 139, 230, 0.9);
+    display: none;
+}
+
+/* Reserve space on the right of Docmost's header so the 3-line button never overlaps controls */
+body.has-desktop-menu header.mantine-AppShell-header,
+body.has-desktop-menu header [class*="_header_"] {
+    padding-right: 54px !important;
+}
+
+.docmost-dropdown-nav-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 4px 6px 6px 6px;
+}
+.docmost-dropdown-nav-btn {
+    height: 30px;
+    background: #1f1f1f;
+    border: 1px solid #333333;
+    border-radius: 5px;
+    color: #c9c9c9;
+    cursor: pointer;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    user-select: none;
+}
+.docmost-dropdown-nav-btn:hover {
     background: #2e2e2e;
     border-color: #484848;
     color: #ffffff;
@@ -161,25 +112,21 @@ body.has-desktop-nav .mantine-AppShell-navbar {
     flex-shrink: 0;
 }
 
-.docmost-chevron {
-    font-size: 9px;
-    color: #828282;
-    margin-left: 2px;
-}
-
 /* Mantine Style Dropdown Menus */
 .docmost-dropdown-menu {
     position: fixed;
-    top: 38px;
+    top: 46px;
+    right: 12px;
     background: #242424;
     border: 1px solid #383838;
     border-radius: 8px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
-    padding: 4px;
+    padding: 6px;
     z-index: 2147483647 !important;
     display: none;
     flex-direction: column;
-    min-width: 260px;
+    min-width: 270px;
+    max-width: 340px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     animation: mantineFadeIn 0.12s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -234,6 +181,8 @@ body.has-desktop-nav .mantine-AppShell-navbar {
     align-items: center;
     gap: 8px;
     overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .docmost-dropdown-shortcut {
     font-size: 11px;
@@ -242,64 +191,9 @@ body.has-desktop-nav .mantine-AppShell-navbar {
     font-family: monospace;
 }
 
-/* Dedicated Server Switcher Dropdown */
-#docmost-server-dropdown {
-    min-width: 280px;
-    max-width: 360px;
-}
-.docmost-dropdown-header {
-    font-size: 11px;
-    font-weight: 700;
-    color: #828282;
-    padding: 8px 10px;
-    background: transparent;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    user-select: none;
-}
 .docmost-dropdown-list {
-    max-height: 240px;
+    max-height: 200px;
     overflow-y: auto;
-}
-.docmost-server-item {
-    padding: 8px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    transition: background-color 0.12s ease;
-    border-radius: 4px;
-    text-decoration: none;
-    margin-bottom: 2px;
-}
-.docmost-server-item:hover {
-    background-color: #2e2e2e;
-}
-.docmost-server-item.active {
-    background-color: rgba(34, 139, 230, 0.15);
-    color: #339af0;
-}
-.docmost-server-item-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    overflow: hidden;
-}
-.docmost-server-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #f1f5f9;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.docmost-server-sub {
-    font-size: 11px;
-    color: #828282;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 .docmost-server-del-btn {
     background: transparent;
@@ -330,30 +224,26 @@ body.has-desktop-nav .mantine-AppShell-navbar {
     background: #1c7ed6;
 }
 
-/* Update Pill */
+/* Update Pill inside Menu */
 .docmost-update-banner {
     background: rgba(34, 139, 230, 0.18);
     border: 1px solid #228be6;
     color: #74c0fc;
     font-weight: 600;
-    border-radius: 14px;
-    padding: 3px 10px;
-    font-size: 11px;
+    border-radius: 5px;
+    padding: 7px 10px;
+    margin: 4px 0;
+    font-size: 12px;
     cursor: pointer;
     display: none;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 6px;
     transition: all 0.15s ease;
-    animation: updatePulse 2s infinite;
 }
 .docmost-update-banner:hover {
     background: #228be6;
     color: #ffffff;
-}
-@keyframes updatePulse {
-    0% { box-shadow: 0 0 0 0 rgba(34, 139, 230, 0.5); }
-    70% { box-shadow: 0 0 0 6px rgba(34, 139, 230, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(34, 139, 230, 0); }
 }
 
 /* Injected Modal Overlay */
@@ -1036,12 +926,10 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             document.dispatchEvent(new KeyboardEvent('keydown', {{ key: 'y', code: 'KeyY', ctrlKey: true, bubbles: true }}));
         }};
 
-        // Dropdown Menus Management
+        // Dropdown Menu Management (Top-Right 3-Line Menu)
         window.closeAllDropdowns = function() {{
             const appMenu = document.getElementById('docmost-app-dropdown-menu');
             if (appMenu) appMenu.style.display = 'none';
-            const serverDd = document.getElementById('docmost-server-dropdown');
-            if (serverDd) serverDd.style.display = 'none';
             const menuBtn = document.getElementById('docmost-app-menu-btn');
             if (menuBtn) menuBtn.classList.remove('active');
         }};
@@ -1057,11 +945,14 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 const displayUrl = s.url.replace('https://', '').replace('http://', '');
                 html += `
                     <div class="docmost-dropdown-item ${{isActive ? 'active' : ''}}" onclick="window.selectServer('${{s.id}}', '${{s.url}}')">
-                        <div class="docmost-dropdown-item-left">
+                        <div class="docmost-dropdown-item-left" style="flex:1; min-width:0;">
                             <span class="docmost-status-dot" style="${{isActive ? '' : 'background:#666; box-shadow:none;'}}"></span>
-                            <span>${{s.name}}</span>
+                            <div style="overflow:hidden;">
+                                <div style="font-size:13px; font-weight:600; color:${{isActive ? '#ffffff' : '#c9c9c9'}}; overflow:hidden; text-overflow:ellipsis;">${{s.name}} ${{isActive ? '<span style="font-size:10px; color:#339af0; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
+                                <div style="font-size:11px; color:#828282; overflow:hidden; text-overflow:ellipsis;">${{displayUrl}}</div>
+                            </div>
                         </div>
-                        <span style="font-size:11px; color:#888;">${{isActive ? '(Aktiv)' : displayUrl}}</span>
+                        ${{servers.length > 1 ? `<button class="docmost-server-del-btn" onclick="window.deleteServer(event, '${{s.id}}')" title="Server entfernen">✕</button>` : ''}}
                     </div>
                 `;
             }});
@@ -1072,9 +963,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             if (e) e.stopPropagation();
             const menu = document.getElementById('docmost-app-dropdown-menu');
             const menuBtn = document.getElementById('docmost-app-menu-btn');
-            const serverDd = document.getElementById('docmost-server-dropdown');
             if (!menu) return;
-            if (serverDd) serverDd.style.display = 'none';
 
             if (menu.style.display === 'flex') {{
                 menu.style.display = 'none';
@@ -1083,39 +972,13 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 window.renderAppMenuServers();
                 if (menuBtn) {{
                     const rect = menuBtn.getBoundingClientRect();
-                    menu.style.top = (rect.bottom + 4) + 'px';
-                    menu.style.left = rect.left + 'px';
+                    menu.style.top = (rect.bottom + 6) + 'px';
+                    menu.style.right = Math.max(8, window.innerWidth - rect.right) + 'px';
+                    menu.style.left = 'auto';
                     menuBtn.classList.add('active');
                 }}
                 menu.style.display = 'flex';
             }}
-        }};
-
-        // Server Dropdown Logic
-        window.renderServerDropdown = function() {{
-            const container = document.getElementById('docmost-server-dropdown-items');
-            if (!container) return;
-            const servers = window.__docmostConfig.servers || [];
-            const activeId = window.__docmostConfig.activeServerId;
-
-            let html = '';
-            servers.forEach(s => {{
-                const isActive = s.id === activeId;
-                const displayUrl = s.url.replace('https://', '').replace('http://', '');
-                html += `
-                    <div class="docmost-server-item ${{isActive ? 'active' : ''}}" onclick="window.selectServer('${{s.id}}', '${{s.url}}')">
-                        <div class="docmost-server-item-left">
-                            <span class="docmost-status-dot" style="${{isActive ? '' : 'background:#666; box-shadow:none;'}}"></span>
-                            <div style="overflow:hidden;">
-                                <div class="docmost-server-title">${{s.name}} ${{isActive ? '<span style="font-size:10px; color:#339af0; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
-                                <div class="docmost-server-sub">${{displayUrl}}</div>
-                            </div>
-                        </div>
-                        ${{servers.length > 1 ? `<button class="docmost-server-del-btn" onclick="window.deleteServer(event, '${{s.id}}')" title="Server löschen">✕</button>` : ''}}
-                    </div>
-                `;
-            }});
-            container.innerHTML = html;
         }};
 
         window.renderSettingsServerList = function() {{
@@ -1147,42 +1010,16 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             container.innerHTML = html;
         }};
 
-        window.toggleServerDropdown = function(e) {{
-            if (e) e.stopPropagation();
-            const dd = document.getElementById('docmost-server-dropdown');
-            const appMenu = document.getElementById('docmost-app-dropdown-menu');
-            if (!dd) return;
-            if (appMenu) appMenu.style.display = 'none';
-            const menuBtn = document.getElementById('docmost-app-menu-btn');
-            if (menuBtn) menuBtn.classList.remove('active');
-
-            if (dd.style.display === 'flex') {{
-                dd.style.display = 'none';
-            }} else {{
-                window.renderServerDropdown();
-                const badge = document.getElementById('docmost-server-switcher-btn');
-                if (badge) {{
-                    const rect = badge.getBoundingClientRect();
-                    dd.style.top = (rect.bottom + 4) + 'px';
-                    dd.style.left = Math.max(10, rect.left - 50) + 'px';
-                }}
-                dd.style.display = 'flex';
-            }}
-        }};
-
         window.addEventListener('click', (e) => {{
             if (!e.target.closest('#docmost-app-dropdown-menu') &&
-                !e.target.closest('#docmost-app-menu-btn') &&
-                !e.target.closest('#docmost-server-dropdown') &&
-                !e.target.closest('#docmost-server-switcher-btn')) {{
+                !e.target.closest('#docmost-app-menu-btn')) {{
                 window.closeAllDropdowns();
             }}
         }});
 
         window.selectServer = function(id, url) {{
+            window.closeAllDropdowns();
             if (id === window.__docmostConfig.activeServerId && url === window.location.href) {{
-                const dd = document.getElementById('docmost-server-dropdown');
-                if (dd) dd.style.display = 'none';
                 return;
             }}
             window.__docmostConfig.activeServerId = id;
@@ -1192,16 +1029,13 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                     server_id: id
                 }}));
             }}
-            const dd = document.getElementById('docmost-server-dropdown');
-            if (dd) dd.style.display = 'none';
             window.closeSettingsModal();
             window.location.href = url;
         }};
 
         window.openAddServerModal = function(e) {{
             if (e) e.stopPropagation();
-            const dd = document.getElementById('docmost-server-dropdown');
-            if (dd) dd.style.display = 'none';
+            window.closeAllDropdowns();
             const modal = document.getElementById('docmost-add-server-modal');
             if (modal) modal.style.display = 'flex';
         }};
@@ -1244,7 +1078,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 }}));
             }}
             window.__docmostConfig.servers = (window.__docmostConfig.servers || []).filter(s => s.id !== id);
-            window.renderServerDropdown();
+            window.renderAppMenuServers();
             window.renderSettingsServerList();
         }};
 
@@ -1369,6 +1203,8 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 banner.style.display = 'flex';
                 banner.innerHTML = '<span>⬆ Update verfügbar (' + (info.version || '') + ')</span>';
             }}
+            const dot = document.getElementById('docmost-menu-update-dot');
+            if (dot) dot.style.display = 'block';
             const titleEl = document.getElementById('update-modal-title');
             if (titleEl) titleEl.innerText = info.title || ('Version ' + info.version);
             const clEl = document.getElementById('update-modal-changelog');
@@ -1629,6 +1465,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         // Keyboard shortcuts
         window.addEventListener('keydown', (e) => {{
             if (e.key === 'Escape') {{
+                window.closeAllDropdowns();
                 const mediaModal = document.getElementById('docmost-media-modal');
                 if (mediaModal && mediaModal.style.display === 'flex') {{
                     window.closeMediaPlayer();
@@ -1643,37 +1480,23 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }});
 
         // Factory Functions for DOM elements
-        function createNavElement() {{
-            const nav = document.createElement('div');
-            nav.id = 'docmost-desktop-nav';
-            nav.innerHTML = `
-                <div class="docmost-nav-group">
-                    <button id="docmost-app-menu-btn" class="docmost-menu-trigger-btn" onclick="window.toggleAppMenu(event)" title="Docmost Desktop Menü">
-                        <span class="docmost-brand-badge">D</span>
-                        <span style="font-size:13px; font-weight:600; color:#f1f5f9;">Docmost</span>
-                        <span class="docmost-chevron">▾</span>
-                    </button>
-                    <div style="width:1px; height:18px; background:#2e2e2e; margin:0 3px;"></div>
-                    <button class="docmost-icon-btn" onclick="window.history.back()" title="Zurück (Alt+◀)">◀</button>
-                    <button class="docmost-icon-btn" onclick="window.history.forward()" title="Vorwärts (Alt+▶)">▶</button>
-                    <button class="docmost-icon-btn" onclick="window.location.reload()" title="Neu laden (F5)">↻</button>
-                    <button class="docmost-icon-btn" onclick="window.location.href='{url}'" title="Startseite">🏠</button>
-                </div>
-                <div class="docmost-nav-group">
-                    <div id="docmost-server-switcher-btn" class="docmost-server-pill" onclick="window.toggleServerDropdown(event)" title="Server wechseln">
-                        <span class="docmost-status-dot"></span>
-                        <span id="docmost-nav-server-name">{active_server_name}</span>
-                        <span class="docmost-chevron">▾</span>
-                    </div>
-                </div>
-                <div class="docmost-nav-group">
-                    <div id="docmost-update-btn" class="docmost-update-banner" onclick="window.openUpdateModal()">
-                        <span>⬆ Update verfügbar</span>
-                    </div>
-                    <button class="docmost-icon-btn" onclick="window.openSettingsModal()" title="Einstellungen">⚙</button>
-                </div>
+        function createMenuTriggerButton() {{
+            if (document.getElementById('docmost-app-menu-btn')) return;
+            const btn = document.createElement('button');
+            btn.id = 'docmost-app-menu-btn';
+            btn.type = 'button';
+            btn.title = 'Menü • {active_server_name}';
+            btn.setAttribute('aria-label', 'Docmost Desktop Menü');
+            btn.onclick = window.toggleAppMenu;
+            btn.innerHTML = `
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="4" y1="6" x2="20" y2="6"></line>
+                    <line x1="4" y1="12" x2="20" y2="12"></line>
+                    <line x1="4" y1="18" x2="20" y2="18"></line>
+                </svg>
+                <span id="docmost-menu-update-dot"></span>
             `;
-            return nav;
+            document.body.appendChild(btn);
         }}
 
         function createAppMenuDropdown() {{
@@ -1686,37 +1509,31 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                     <span>DOCMOST DESKTOP</span>
                     <span style="font-size:10px; color:#12b886; font-weight:600;">v{version}</span>
                 </div>
-                <div class="docmost-dropdown-item" onclick="window.location.href='{url}'; window.closeAllDropdowns();">
-                    <div class="docmost-dropdown-item-left"><span>🏠</span><span>Startseite</span></div>
+                <div class="docmost-dropdown-nav-row">
+                    <button class="docmost-dropdown-nav-btn" onclick="window.history.back(); window.closeAllDropdowns();" title="Zurück (Alt+◀)">◀</button>
+                    <button class="docmost-dropdown-nav-btn" onclick="window.history.forward(); window.closeAllDropdowns();" title="Vorwärts (Alt+▶)">▶</button>
+                    <button class="docmost-dropdown-nav-btn" onclick="window.location.reload(); window.closeAllDropdowns();" title="Seite neu laden (F5)">↻</button>
+                    <button class="docmost-dropdown-nav-btn" onclick="window.location.href='{url}'; window.closeAllDropdowns();" title="Startseite">🏠</button>
                 </div>
-                <div class="docmost-dropdown-item" onclick="window.location.reload(); window.closeAllDropdowns();">
-                    <div class="docmost-dropdown-item-left"><span>↻</span><span>Seite neu laden</span></div>
-                    <span class="docmost-dropdown-shortcut">F5</span>
-                </div>
-                <div class="docmost-dropdown-item" onclick="window.history.back(); window.closeAllDropdowns();">
-                    <div class="docmost-dropdown-item-left"><span>◀</span><span>Zurück</span></div>
-                    <span class="docmost-dropdown-shortcut">Alt+◀</span>
-                </div>
-                <div class="docmost-dropdown-item" onclick="window.history.forward(); window.closeAllDropdowns();">
-                    <div class="docmost-dropdown-item-left"><span>▶</span><span>Vorwärts</span></div>
-                    <span class="docmost-dropdown-shortcut">Alt+▶</span>
+                <div id="docmost-update-btn" class="docmost-update-banner" onclick="window.openUpdateModal(); window.closeAllDropdowns();">
+                    <span>⬆ Update verfügbar</span>
                 </div>
                 <div class="docmost-dropdown-divider"></div>
-                <div class="docmost-dropdown-label">SERVER</div>
-                <div id="docmost-app-menu-servers-list"></div>
-                <div class="docmost-dropdown-item" onclick="window.openAddServerModal(); window.closeAllDropdowns();">
-                    <div class="docmost-dropdown-item-left"><span>➕</span><span>Neuen Server hinzufügen...</span></div>
+                <div class="docmost-dropdown-label" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>SERVER WECHSELN</span>
+                    <button class="docmost-add-server-btn" onclick="window.openAddServerModal(event)">+ Neu</button>
                 </div>
+                <div id="docmost-app-menu-servers-list" class="docmost-dropdown-list"></div>
                 <div class="docmost-dropdown-divider"></div>
-                <div class="docmost-dropdown-label">DESKTOP FUNKTIONEN</div>
+                <div class="docmost-dropdown-label">EINSTELLUNGEN &amp; TOOLS</div>
                 <div class="docmost-dropdown-item" onclick="window.switchSettingsTab('pen'); window.openSettingsModal(); window.closeAllDropdowns();">
                     <div class="docmost-dropdown-item-left"><span>🖊️</span><span>Stift &amp; Excalidraw</span></div>
                 </div>
                 <div class="docmost-dropdown-item" onclick="window.switchSettingsTab('office'); window.openSettingsModal(); window.closeAllDropdowns();">
                     <div class="docmost-dropdown-item-left"><span>📄</span><span>Office &amp; Medien-Viewer</span></div>
                 </div>
-                <div class="docmost-dropdown-item" onclick="window.openSettingsModal(); window.closeAllDropdowns();">
-                    <div class="docmost-dropdown-item-left"><span>⚙</span><span>Desktop Einstellungen...</span></div>
+                <div class="docmost-dropdown-item" onclick="window.switchSettingsTab('general'); window.openSettingsModal(); window.closeAllDropdowns();">
+                    <div class="docmost-dropdown-item-left"><span>⚙</span><span>Alle Einstellungen...</span></div>
                 </div>
                 <div class="docmost-dropdown-divider"></div>
                 <div class="docmost-dropdown-item" onclick="window.checkUpdatesManually(); window.closeAllDropdowns();">
@@ -1756,21 +1573,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 <button class="docmost-pen-btn" style="padding:4px 8px; color:#94a3b8;" onclick="document.getElementById('docmost-pen-toolbar').style.display='none'" title="Leiste ausblenden">✕</button>
             `;
             document.body.appendChild(tb);
-        }}
-
-        function createServerDropdown() {{
-            if (document.getElementById('docmost-server-dropdown')) return;
-            const dd = document.createElement('div');
-            dd.id = 'docmost-server-dropdown';
-            dd.className = 'docmost-dropdown-menu';
-            dd.innerHTML = `
-                <div class="docmost-dropdown-header">
-                    <span>GESPEICHERTE SERVER</span>
-                    <button class="docmost-add-server-btn" onclick="window.openAddServerModal(event)">+ Neu</button>
-                </div>
-                <div id="docmost-server-dropdown-items" class="docmost-dropdown-list"></div>
-            `;
-            document.body.appendChild(dd);
         }}
 
         function createModals() {{
@@ -2048,13 +1850,12 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
                 if (!document.body) return;
 
-                if (!document.body.classList.contains('has-desktop-nav')) {{
-                    document.body.classList.add('has-desktop-nav');
+                if (!document.body.classList.contains('has-desktop-menu')) {{
+                    document.body.classList.add('has-desktop-menu');
                 }}
 
-                if (!document.getElementById('docmost-desktop-nav')) {{
-                    const nav = createNavElement();
-                    document.body.prepend(nav);
+                if (!document.getElementById('docmost-app-menu-btn')) {{
+                    createMenuTriggerButton();
                 }}
 
                 if (!document.getElementById('docmost-app-dropdown-menu')) {{
@@ -2063,10 +1864,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
                 if (!document.getElementById('docmost-settings-modal')) {{
                     createModals();
-                }}
-
-                if (!document.getElementById('docmost-server-dropdown')) {{
-                    createServerDropdown();
                 }}
 
                 if (!document.getElementById('docmost-pen-toolbar')) {{
@@ -2099,7 +1896,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 let ignore = true;
                 for (let i = 0; i < mutations.length; i++) {{
                     const t = mutations[i].target;
-                    if (!t || (t.id !== 'docmost-desktop-nav' && t.id !== 'docmost-desktop-modals' && !t.closest?.('#docmost-desktop-modals, #docmost-desktop-nav, #docmost-app-dropdown-menu, #docmost-server-dropdown, #docmost-pen-toolbar'))) {{
+                    if (!t || (t.id !== 'docmost-app-menu-btn' && t.id !== 'docmost-desktop-modals' && !t.closest?.('#docmost-desktop-modals, #docmost-app-menu-btn, #docmost-app-dropdown-menu, #docmost-pen-toolbar'))) {{
                         ignore = false;
                         break;
                     }}
@@ -2341,10 +2138,10 @@ mod tests {
         let cfg = crate::config::AppConfig::default();
         let script = get_injection_script(&cfg, "0.1.7");
         let _ = std::fs::write("target/test_injection.js", &script);
-        assert!(script.contains("docmost-desktop-nav"));
+        assert!(!script.contains("docmost-desktop-nav"));
         assert!(script.contains("docmost-app-menu-btn"));
         assert!(script.contains("docmost-app-dropdown-menu"));
-        assert!(script.contains("docmost-server-switcher-btn"));
+        assert!(script.contains("docmost-menu-update-dot"));
         assert!(script.contains("toggleAppMenu"));
         assert!(script.contains("renderAppMenuServers"));
         assert!(script.contains("closeAllDropdowns"));
