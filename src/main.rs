@@ -45,6 +45,26 @@ enum UserEvent {
     UpdateCheckFinished(String),
 }
 
+const MAX_LOG_BYTES: u64 = 64 * 1024;
+
+fn append_bounded_log(file_name: &str, line: &str) {
+    let log_file = std::env::temp_dir().join(file_name);
+    let truncate = std::fs::metadata(&log_file)
+        .map(|m| m.len() > MAX_LOG_BYTES)
+        .unwrap_or(false);
+    let mut opts = std::fs::OpenOptions::new();
+    opts.create(true);
+    if truncate {
+        opts.write(true).truncate(true);
+    } else {
+        opts.append(true);
+    }
+    if let Ok(mut f) = opts.open(log_file) {
+        use std::io::Write;
+        let _ = f.write_all(line.as_bytes());
+    }
+}
+
 #[cfg(windows)]
 fn show_error_box(msg: &str) {
     use std::ffi::OsStr;
@@ -170,6 +190,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut builder = WebViewBuilder::new_with_web_context(&mut web_context)
         .with_devtools(true)
+        .with_background_color((20, 20, 20, 255))
         .with_initialization_script(&injection_script);
 
     #[cfg(windows)]
@@ -185,12 +206,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             wry::PageLoadEvent::Started => "Started",
             wry::PageLoadEvent::Finished => "Finished",
         };
-        let log_file = std::env::temp_dir().join("docmost_navigation.log");
-        let line = format!("[Navigation {}] {}\n", evt_str, url);
-        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(log_file) {
-            use std::io::Write;
-            let _ = write!(f, "{}", line);
-        }
+        append_bounded_log("docmost_navigation.log", &format!("[Navigation {}] {}\n", evt_str, url));
     });
 
     if config.server_url.trim().is_empty() {
@@ -250,12 +266,26 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                             thread::spawn(move || {
                                 use base64::Engine;
                                 let engine = base64::engine::general_purpose::STANDARD;
-                                if let Ok(bytes) = engine.decode(&b64) {
+                                let mut bytes = Vec::with_capacity((b64.len() / 4) * 3);
+                                if engine.decode_vec(&b64, &mut bytes).is_ok() {
                                     let temp_dir = std::env::temp_dir().join("DocmostApp").join("Files");
                                     let _ = std::fs::create_dir_all(&temp_dir);
+                                    // Opportunistically clean up temp files older than 24 hours
+                                    if let Ok(entries) = std::fs::read_dir(&temp_dir) {
+                                        let now = std::time::SystemTime::now();
+                                        for entry in entries.flatten() {
+                                            if let Ok(meta) = entry.metadata() {
+                                                if let Ok(modified) = meta.modified() {
+                                                    if now.duration_since(modified).map(|d| d.as_secs() > 86400).unwrap_or(false) {
+                                                        let _ = std::fs::remove_file(entry.path());
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                     let clean_name = name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
                                     let target = temp_dir.join(&clean_name);
-                                    if std::fs::write(&target, bytes).is_ok() {
+                                    if std::fs::write(&target, &bytes).is_ok() {
                                         let _ = open::that(&target);
                                     }
                                 }
@@ -356,12 +386,12 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
                     "console_log" => {
-                        let log_file = std::env::temp_dir().join("docmost_console.log");
-                        let line = format!("[JS {:?}] {}\n", parsed.level.as_deref().unwrap_or("log"), parsed.message.as_deref().unwrap_or(""));
-                        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(log_file) {
-                            use std::io::Write;
-                            let _ = write!(f, "{}", line);
-                        }
+                        let line = format!(
+                            "[JS {:?}] {}\n",
+                            parsed.level.as_deref().unwrap_or("log"),
+                            parsed.message.as_deref().unwrap_or("")
+                        );
+                        append_bounded_log("docmost_console.log", &line);
                     }
                     _ => {}
                 }
@@ -369,21 +399,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         })
         .build(&window)?;
 
-    // Hintergrund-Thread: Automatischer Update-Check beim Programmstart
+    // Hintergrund-Thread: Automatischer Update-Check beim Programmstart (einmalig verzögert)
     if config.check_updates_on_startup {
         let repo = config.github_repo.clone();
         let cur_ver = current_version.to_string();
         let p = proxy.clone();
         let pend = Arc::clone(&pending_update);
         thread::spawn(move || {
-            // Kurze Pause von 2 Sekunden für reibungslosen UI-Start
-            thread::sleep(Duration::from_secs(2));
+            thread::sleep(Duration::from_secs(3));
             if let Ok(Some(info)) = updater::check_for_updates(&repo, &cur_ver) {
                 *pend.lock().unwrap() = Some(info.clone());
-                let _ = p.send_event(UserEvent::UpdateAvailable(info.clone()));
-
-                // Nochmal nach 3 Sekunden senden falls die Webseite gerade erst geladen/weitergeleitet hat
-                thread::sleep(Duration::from_secs(3));
                 let _ = p.send_event(UserEvent::UpdateAvailable(info));
             }
         });
@@ -414,11 +439,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             },
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::CloseRequested => {
-                    let mut cfg = shared_config.lock().unwrap();
                     let size = window.inner_size();
-                    cfg.window_width = size.width;
-                    cfg.window_height = size.height;
-                    let _ = cfg.save();
+                    if size.width > 100 && size.height > 100 {
+                        let mut cfg = shared_config.lock().unwrap();
+                        if cfg.window_width != size.width || cfg.window_height != size.height {
+                            cfg.window_width = size.width;
+                            cfg.window_height = size.height;
+                            let _ = cfg.save();
+                        }
+                    }
                     *control_flow = ControlFlow::Exit;
                 }
                 _ => {}

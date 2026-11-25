@@ -36,9 +36,7 @@ pub const CLEAN_DARK_GLOBAL_CSS: &str = r#"
     right: 12px;
     width: 32px;
     height: 32px;
-    background: rgba(31, 31, 31, 0.88);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: #1f1f1f;
     border: 1px solid #383838;
     border-radius: 6px;
     color: #c9c9c9;
@@ -72,9 +70,8 @@ pub const CLEAN_DARK_GLOBAL_CSS: &str = r#"
 }
 
 /* Reserve space on the right of Docmost's header so the 3-line button never overlaps controls */
-body.has-desktop-menu header.mantine-AppShell-header,
-body.has-desktop-menu header [class*="_header_"] {
-    padding-right: 54px !important;
+body.has-desktop-menu .mantine-AppShell-header {
+    padding-right: 44px !important;
 }
 
 .docmost-dropdown-nav-row {
@@ -254,8 +251,7 @@ body.has-desktop-menu header [class*="_header_"] {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.78);
     z-index: 2147483647 !important;
     align-items: center;
     justify-content: center;
@@ -351,9 +347,7 @@ body.has-desktop-menu header [class*="_header_"] {
 .excalidraw .Island,
 .excalidraw .App-toolbar,
 .excalidraw .layer-ui__wrapper .Island {
-    background: rgba(18, 22, 34, 0.94) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
+    background: rgba(18, 22, 34, 0.97) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 12px !important;
     box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
@@ -458,8 +452,7 @@ body.has-desktop-menu header [class*="_header_"] {
 .excalidraw .layer-ui__wrapper .footer-right,
 .excalidraw .undo-redo-buttons,
 .excalidraw .zoom-actions {
-    background: rgba(18, 22, 34, 0.92) !important;
-    backdrop-filter: blur(14px) !important;
+    background: rgba(18, 22, 34, 0.96) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 10px !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
@@ -532,9 +525,7 @@ body.has-desktop-menu header [class*="_header_"] {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(18, 22, 34, 0.95);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    background: rgba(18, 22, 34, 0.97);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 40px;
     padding: 6px 14px;
@@ -746,8 +737,6 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             }} catch (e) {{}}
         }}
 
-        logToRust('info', 'Docmost Desktop Script initialized at: ' + window.location.href);
-
         window.addEventListener('error', function(e) {{
             logToRust('error', (e.message || 'Error') + ' at ' + (e.filename || '') + ':' + (e.lineno || ''));
         }});
@@ -774,75 +763,102 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             officeViewerEnabled: {office_viewer_enabled}
         }};
 
-        // Safe CSS Injection
+        let styleInjected = false;
+        let lastZoomApplied = null;
+        let excalidrawWasPresent = false;
+
+        // Safe CSS Injection (cached)
         const injectStyles = () => {{
-            if (document.getElementById('docmost-desktop-style')) return;
+            if (styleInjected && document.getElementById('docmost-desktop-style')) return;
+            if (document.getElementById('docmost-desktop-style')) {{ styleInjected = true; return; }}
             const target = document.head || document.documentElement;
             if (!target) return;
             const style = document.createElement('style');
             style.id = 'docmost-desktop-style';
             style.textContent = `{css}`;
             target.appendChild(style);
+            styleInjected = true;
         }};
 
-        // Safe Zoom
+        // Safe Zoom (cached to avoid redundant style recalc)
         const applyZoom = () => {{
-            if (document.documentElement && window.__docmostConfig.zoomLevel && window.__docmostConfig.zoomLevel !== 1.0) {{
-                document.documentElement.style.zoom = window.__docmostConfig.zoomLevel;
+            const z = window.__docmostConfig.zoomLevel || 1.0;
+            if (!document.documentElement || z === lastZoomApplied) return;
+            if (z !== 1.0 || lastZoomApplied !== null) {{
+                document.documentElement.style.zoom = z;
             }}
+            lastZoomApplied = z;
         }};
 
-        // Auto-sync Excalidraw Dark Mode & Pen Mode (runs only when Excalidraw is present)
+        // Auto-sync Excalidraw Dark Mode & Pen Mode (only writes localStorage when changed)
         const syncExcalidrawState = () => {{
-            const hasExcalidraw = !!document.querySelector('.excalidraw, [data-testid="excalidraw-container"]');
-            if (!hasExcalidraw) return;
+            if (!excalidrawWasPresent && !document.querySelector('.excalidraw, [data-testid="excalidraw-container"]')) return;
             try {{
                 const rawState = localStorage.getItem('excalidraw-state');
                 let state = rawState ? JSON.parse(rawState) : {{}};
+                let dirty = false;
                 if (window.__docmostConfig.darkTheme) {{
-                    state.theme = 'dark';
-                    localStorage.setItem('excalidraw-theme', 'dark');
+                    if (state.theme !== 'dark') {{ state.theme = 'dark'; dirty = true; }}
+                    if (localStorage.getItem('excalidraw-theme') !== 'dark') {{
+                        localStorage.setItem('excalidraw-theme', 'dark');
+                    }}
                 }}
                 if (window.__docmostConfig.penMode) {{
-                    state.penMode = true;
-                    state.penDetected = true;
+                    if (!state.penMode || !state.penDetected) {{
+                        state.penMode = true;
+                        state.penDetected = true;
+                        dirty = true;
+                    }}
                 }}
-                localStorage.setItem('excalidraw-state', JSON.stringify(state));
+                if (dirty) {{
+                    localStorage.setItem('excalidraw-state', JSON.stringify(state));
+                }}
             }} catch (e) {{}}
         }};
 
         const ensureExcalidrawDark = () => {{
             if (window.__docmostConfig.darkTheme) {{
-                document.querySelectorAll('.excalidraw').forEach(el => {{
-                    if (!el.classList.contains('theme--dark')) {{
-                        el.classList.add('theme--dark');
-                    }}
+                document.querySelectorAll('.excalidraw:not(.theme--dark)').forEach(el => {{
+                    el.classList.add('theme--dark');
                 }});
             }}
         }};
 
         const checkExcalidrawPresence = () => {{
-            ensureExcalidrawDark();
             const hasExcalidraw = !!document.querySelector('.excalidraw, [data-testid="excalidraw-container"]');
+            if (hasExcalidraw) {{
+                ensureExcalidrawDark();
+                if (!excalidrawWasPresent) {{
+                    excalidrawWasPresent = true;
+                    syncExcalidrawState();
+                }}
+                if (window.__docmostConfig.quickToolbar) {{
+                    if (!document.getElementById('docmost-pen-toolbar')) {{
+                        createPenToolbar();
+                    }}
+                }}
+            }} else {{
+                excalidrawWasPresent = false;
+            }}
             const penToolbar = document.getElementById('docmost-pen-toolbar');
             if (penToolbar) {{
-                if (hasExcalidraw && window.__docmostConfig.quickToolbar) {{
-                    penToolbar.style.display = 'flex';
-                }} else {{
-                    penToolbar.style.display = 'none';
+                const wantDisplay = (hasExcalidraw && window.__docmostConfig.quickToolbar) ? 'flex' : 'none';
+                if (penToolbar.style.display !== wantDisplay) {{
+                    penToolbar.style.display = wantDisplay;
                 }}
             }}
         }};
 
-        // Stylus / Palm Rejection Logic
+        // Stylus / Palm Rejection Logic (zero DOM traversal when Excalidraw is inactive)
         let lastPenContactTime = 0;
         window.addEventListener('pointerdown', (e) => {{
+            if (!excalidrawWasPresent) return;
             if (e.pointerType === 'pen') {{
                 lastPenContactTime = Date.now();
                 const badge = document.getElementById('badge-palm-rejection');
                 if (badge) badge.style.opacity = '1';
             }} else if (e.pointerType === 'touch' && window.__docmostConfig.palmRejection) {{
-                const onCanvas = e.target.closest('.excalidraw canvas') || e.target.closest('.excalidraw');
+                const onCanvas = e.target.closest('.excalidraw canvas, .excalidraw');
                 if (onCanvas && (Date.now() - lastPenContactTime < 1200 || window.__docmostConfig.penMode)) {{
                     if (e.isPrimary && !e.shiftKey) {{
                         e.stopPropagation();
@@ -852,13 +868,15 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }}, true);
 
         window.addEventListener('pointerup', (e) => {{
+            if (!excalidrawWasPresent) return;
             if (e.pointerType === 'pen') {{
                 lastPenContactTime = Date.now();
             }}
         }}, true);
 
         window.addEventListener('contextmenu', (e) => {{
-            if (e.target.closest('.excalidraw canvas') || e.target.closest('.excalidraw')) {{
+            if (!excalidrawWasPresent) return;
+            if (e.target.closest('.excalidraw canvas, .excalidraw')) {{
                 e.preventDefault();
             }}
         }}, true);
@@ -961,6 +979,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
         window.toggleAppMenu = function(e) {{
             if (e) e.stopPropagation();
+            createAppMenuDropdown();
             const menu = document.getElementById('docmost-app-dropdown-menu');
             const menuBtn = document.getElementById('docmost-app-menu-btn');
             if (!menu) return;
@@ -970,6 +989,13 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 if (menuBtn) menuBtn.classList.remove('active');
             }} else {{
                 window.renderAppMenuServers();
+                if (window.__pendingUpdateInfo) {{
+                    const banner = document.getElementById('docmost-update-btn');
+                    if (banner) {{
+                        banner.style.display = 'flex';
+                        banner.innerHTML = '<span>⬆ Update verfügbar (' + (window.__pendingUpdateInfo.version || '') + ')</span>';
+                    }}
+                }}
                 if (menuBtn) {{
                     const rect = menuBtn.getBoundingClientRect();
                     menu.style.top = (rect.bottom + 6) + 'px';
@@ -1036,6 +1062,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         window.openAddServerModal = function(e) {{
             if (e) e.stopPropagation();
             window.closeAllDropdowns();
+            createModals();
             const modal = document.getElementById('docmost-add-server-modal');
             if (modal) modal.style.display = 'flex';
         }};
@@ -1083,6 +1110,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }};
 
         window.switchSettingsTab = function(tabName) {{
+            createModals();
             document.querySelectorAll('.docmost-tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.docmost-tab-pane').forEach(p => p.classList.remove('active'));
 
@@ -1096,6 +1124,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }};
 
         window.openSettingsModal = function() {{
+            createModals();
             window.renderSettingsServerList();
             const el = document.getElementById('docmost-settings-modal');
             if (el) el.style.display = 'flex';
@@ -1106,6 +1135,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }};
 
         window.openUpdateModal = function() {{
+            createModals();
             const el = document.getElementById('docmost-update-modal');
             if (el) el.style.display = 'flex';
         }};
@@ -1158,9 +1188,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             window.__docmostConfig.mediaPlayerEnabled = mediaPlayerEnabled;
             window.__docmostConfig.officeViewerEnabled = officeViewerEnabled;
 
-            if (document.documentElement) {{
-                document.documentElement.style.zoom = zoomLevel;
-            }}
+            applyZoom();
             checkExcalidrawPresence();
             syncExcalidrawState();
 
@@ -1197,6 +1225,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             if (!info) return;
             window.__pendingUpdateInfo = info;
             window.closeSettingsModal();
+            createModals();
 
             const banner = document.getElementById('docmost-update-btn');
             if (banner) {{
@@ -1238,6 +1267,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         let currentMediaTitle = '';
 
         window.openMediaPlayer = function(url, title) {{
+            createModals();
             currentMediaUrl = url;
             currentMediaTitle = title || url.split('/').pop().split('?')[0] || 'Mediendatei';
 
@@ -1297,6 +1327,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         let currentOfficeTitle = '';
 
         window.openOfficeModal = function(url, title) {{
+            createModals();
             currentOfficeUrl = url;
             currentOfficeTitle = title || url.split('/').pop().split('?')[0] || 'Dokument';
 
@@ -1831,22 +1862,18 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             if (zoomSelect) {{
                 zoomSelect.value = String(window.__docmostConfig.zoomLevel || 1.0);
             }}
-
-            if (window.__pendingUpdateInfo) {{
-                window.onUpdateAvailable(window.__pendingUpdateInfo);
-            }}
-            if (!window.__hasCheckedUpdateOnInit && window.ipc) {{
-                window.__hasCheckedUpdateOnInit = true;
-                window.ipc.postMessage(JSON.stringify({{ action: 'check_pending_update' }}));
-            }}
         }}
 
-        // Master UI Synchronizer
+        let observer = null;
+        let observedTarget = null;
+        let uiScanScheduled = false;
+
+        // Master UI Synchronizer (lightweight, lazy-first)
         function ensureDesktopUI() {{
+            uiScanScheduled = false;
             try {{
                 injectStyles();
                 applyZoom();
-                syncExcalidrawState();
 
                 if (!document.body) return;
 
@@ -1858,16 +1885,19 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                     createMenuTriggerButton();
                 }}
 
-                if (!document.getElementById('docmost-app-dropdown-menu')) {{
-                    createAppMenuDropdown();
+                if (observer && observedTarget !== document.body) {{
+                    observer.disconnect();
+                    observer.observe(document.body, {{ childList: true, subtree: true }});
+                    observedTarget = document.body;
                 }}
 
-                if (!document.getElementById('docmost-settings-modal')) {{
-                    createModals();
+                if (window.__pendingUpdateInfo) {{
+                    const dot = document.getElementById('docmost-menu-update-dot');
+                    if (dot) dot.style.display = 'block';
                 }}
-
-                if (!document.getElementById('docmost-pen-toolbar')) {{
-                    createPenToolbar();
+                if (!window.__hasCheckedUpdateOnInit && window.ipc) {{
+                    window.__hasCheckedUpdateOnInit = true;
+                    window.ipc.postMessage(JSON.stringify({{ action: 'check_pending_update' }}));
                 }}
 
                 checkExcalidrawPresence();
@@ -1876,53 +1906,48 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             }}
         }}
 
-        let uiDebounceTimer = null;
-        function debouncedEnsureDesktopUI() {{
-            if (uiDebounceTimer) clearTimeout(uiDebounceTimer);
-            uiDebounceTimer = setTimeout(ensureDesktopUI, 80);
+        function scheduleDesktopCheck() {{
+            if (uiScanScheduled) return;
+            uiScanScheduled = true;
+            if (typeof window.requestIdleCallback === 'function') {{
+                window.requestIdleCallback(() => ensureDesktopUI(), {{ timeout: 300 }});
+            }} else {{
+                setTimeout(ensureDesktopUI, 250);
+            }}
         }}
 
-        // Trigger on all relevant phases
+        // Trigger on initial phases
         ensureDesktopUI();
 
         if (document.readyState === 'loading') {{
-            document.addEventListener('DOMContentLoaded', ensureDesktopUI);
+            document.addEventListener('DOMContentLoaded', ensureDesktopUI, {{ once: true }});
         }}
-        window.addEventListener('load', ensureDesktopUI);
+        window.addEventListener('load', ensureDesktopUI, {{ once: true }});
 
-        // Persistent observer on document tree with intelligent debouncing
+        // Coalesced observer that skips irrelevant scans during rapid typing
         try {{
-            const observer = new MutationObserver((mutations) => {{
-                let ignore = true;
+            observer = new MutationObserver((mutations) => {{
+                if (document.body && !document.getElementById('docmost-app-menu-btn')) {{
+                    ensureDesktopUI();
+                    return;
+                }}
+                if (uiScanScheduled) return;
                 for (let i = 0; i < mutations.length; i++) {{
                     const t = mutations[i].target;
                     if (!t || (t.id !== 'docmost-app-menu-btn' && t.id !== 'docmost-desktop-modals' && !t.closest?.('#docmost-desktop-modals, #docmost-app-menu-btn, #docmost-app-dropdown-menu, #docmost-pen-toolbar'))) {{
-                        ignore = false;
-                        break;
+                        scheduleDesktopCheck();
+                        return;
                     }}
                 }}
-                if (!ignore) {{
-                    debouncedEnsureDesktopUI();
-                }}
             }});
-            if (document.body) {{
-                observer.observe(document.body, {{ childList: true, subtree: true }});
-            }} else if (document.documentElement) {{
-                observer.observe(document.documentElement, {{ childList: true, subtree: true }});
+            const target = document.body || document.documentElement;
+            if (target) {{
+                observer.observe(target, {{ childList: true, subtree: true }});
+                observedTarget = target;
             }}
         }} catch (obsErr) {{
             console.error("[Docmost Desktop] MutationObserver error:", obsErr);
         }}
-
-        // Polling interval safeguard (runs for 6 seconds after start)
-        let pollCount = 0;
-        const pollTimer = setInterval(() => {{
-            ensureDesktopUI();
-            pollCount++;
-            if (pollCount > 24) {{
-                clearInterval(pollTimer);
-            }}
-        }}, 250);
 
     }} catch (fatalErr) {{
         console.error("[Docmost Desktop] Global Init Fatal Error:", fatalErr);
