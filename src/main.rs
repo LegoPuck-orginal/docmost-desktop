@@ -43,6 +43,7 @@ struct IpcMessage {
 enum UserEvent {
     UpdateAvailable(updater::ReleaseInfo),
     UpdateCheckFinished(String),
+    SyncConfig(config::AppConfig, bool),
 }
 
 const MAX_LOG_BYTES: u64 = 64 * 1024;
@@ -260,6 +261,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                             cfg.office_viewer_enabled = ov;
                         }
                         let _ = cfg.save();
+                        let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), false));
                     }
                     "open_temp_file" => {
                         if let (Some(name), Some(b64)) = (parsed.filename, parsed.file_base64) {
@@ -299,11 +301,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                             });
                         }
                     }
+                    "request_config" => {
+                        let cfg = shared_config_for_ipc.lock().unwrap().clone();
+                        let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg, false));
+                    }
                     "switch_server" => {
                         let mut cfg = shared_config_for_ipc.lock().unwrap();
                         if let Some(id) = parsed.server_id {
                             if cfg.set_active_server(&id) {
                                 let _ = cfg.save();
+                                let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), true));
                             }
                         }
                     }
@@ -314,7 +321,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                             if !clean_url.starts_with("http://") && !clean_url.starts_with("https://") {
                                 clean_url = format!("https://{}", clean_url);
                             }
-                            let id = format!("srv_{}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis());
+                            let id = format!("srv_{}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos());
                             let clean_name = if name.trim().is_empty() {
                                 clean_url.replace("https://", "").replace("http://", "")
                             } else {
@@ -329,21 +336,25 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                             cfg.active_server_id = Some(id);
                             cfg.server_url = clean_url;
                             let _ = cfg.save();
+                            let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), true));
                         }
                     }
                     "delete_server" => {
                         let mut cfg = shared_config_for_ipc.lock().unwrap();
                         if let Some(id) = parsed.server_id {
                             if cfg.servers.len() > 1 {
+                                let mut active_changed = false;
                                 cfg.servers.retain(|s| s.id != id);
                                 if cfg.active_server_id.as_deref() == Some(&id) {
                                     let first_opt = cfg.servers.first().cloned();
                                     if let Some(first) = first_opt {
                                         cfg.active_server_id = Some(first.id);
                                         cfg.server_url = first.url;
+                                        active_changed = true;
                                     }
                                 }
                                 let _ = cfg.save();
+                                let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), active_changed));
                             }
                         }
                     }
@@ -435,6 +446,34 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                         status.replace('\'', "\\'")
                     );
                     let _ = webview.evaluate_script(&script);
+                }
+                UserEvent::SyncConfig(cfg, navigate) => {
+                    if let Ok(servers_json) = serde_json::to_string(&cfg.servers) {
+                        let active_id_json = serde_json::to_string(cfg.active_server_id.as_deref().unwrap_or("default")).unwrap_or_else(|_| "\"default\"".to_string());
+                        let server_url_json = serde_json::to_string(&cfg.server_url).unwrap_or_else(|_| "\"\"".to_string());
+                        let onlyoffice_json = serde_json::to_string(&cfg.onlyoffice_url).unwrap_or_else(|_| "\"\"".to_string());
+                        let repo_json = serde_json::to_string(&cfg.github_repo).unwrap_or_else(|_| "\"\"".to_string());
+                        let script = format!(
+                            "if (typeof window.onDesktopConfigSync === 'function') {{ window.onDesktopConfigSync({{ servers: {servers_json}, activeServerId: {active_id_json}, serverUrl: {server_url_json}, githubRepo: {repo_json}, autoUpdate: {auto_up}, penMode: {pen}, palmRejection: {palm}, darkTheme: {dark}, quickToolbar: {qt}, zoomLevel: {zoom}, onlyofficeUrl: {onlyoffice_json}, mediaPlayerEnabled: {mp}, officeViewerEnabled: {ov} }}); }}",
+                            servers_json = servers_json,
+                            active_id_json = active_id_json,
+                            server_url_json = server_url_json,
+                            repo_json = repo_json,
+                            auto_up = cfg.check_updates_on_startup,
+                            pen = cfg.excalidraw_pen_mode,
+                            palm = cfg.excalidraw_palm_rejection,
+                            dark = cfg.excalidraw_dark_theme,
+                            qt = cfg.excalidraw_quick_toolbar,
+                            zoom = cfg.ui_zoom_level,
+                            onlyoffice_json = onlyoffice_json,
+                            mp = cfg.media_player_enabled,
+                            ov = cfg.office_viewer_enabled,
+                        );
+                        let _ = webview.evaluate_script(&script);
+                    }
+                    if navigate && !cfg.server_url.trim().is_empty() {
+                        let _ = webview.load_url(&cfg.server_url);
+                    }
                 }
             },
             Event::WindowEvent { event, .. } => match event {

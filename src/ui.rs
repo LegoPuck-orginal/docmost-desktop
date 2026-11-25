@@ -243,7 +243,7 @@ body.has-desktop-menu .mantine-AppShell-header {
     color: #ffffff;
 }
 
-/* Injected Modal Overlay */
+/* Injected Modal Overlay (Docmost Mantine Dark) */
 .docmost-modal-overlay {
     display: none;
     position: fixed;
@@ -259,39 +259,103 @@ body.has-desktop-menu .mantine-AppShell-header {
 }
 
 .docmost-modal-box {
-    background: #131724;
-    border: 1px solid #28314a;
-    border-radius: 12px;
+    background: #1f1f1f;
+    border: 1px solid #383838;
+    border-radius: 8px;
     width: 480px;
     max-width: 90vw;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-    color: #f1f5f9;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+    color: #c9c9c9;
     overflow: hidden;
 }
 
 .docmost-modal-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid #20273c;
+    padding: 14px 18px;
+    background: #242424;
+    border-bottom: 1px solid #2e2e2e;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    color: #f1f5f9;
+}
+
+.docmost-modal-close {
+    cursor: pointer;
+    color: #828282;
+    font-size: 16px;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.12s ease, color 0.12s ease;
+    user-select: none;
+}
+.docmost-modal-close:hover {
+    background: #2e2e2e;
+    color: #ffffff;
 }
 
 .docmost-modal-body {
-    padding: 20px;
+    padding: 18px 20px;
 }
 
 .docmost-modal-footer {
-    padding: 14px 20px;
-    background: #0f121d;
-    border-top: 1px solid #20273c;
+    padding: 12px 18px;
+    background: #1a1a1a;
+    border-top: 1px solid #2e2e2e;
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 8px;
+}
+
+.docmost-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #828282;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.docmost-surface-card {
+    background: #141414;
+    border: 1px solid #2e2e2e;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.docmost-field-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #b8b8b8;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.docmost-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: #141414;
+    border: 1px solid #383838;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #f1f5f9;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.12s ease;
+}
+.docmost-input:focus {
+    border-color: #228be6;
 }
 
 .docmost-btn-primary {
-    background: #6366f1;
+    background: #228be6;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -299,86 +363,82 @@ body.has-desktop-menu .mantine-AppShell-header {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background-color 0.12s ease;
 }
 .docmost-btn-primary:hover {
-    background: #4f46e5;
+    background: #1c7ed6;
 }
 
 .docmost-btn-secondary {
-    background: #1d2336;
-    color: #cbd5e1;
-    border: 1px solid #2f3956;
+    background: #2e2e2e;
+    color: #c9c9c9;
+    border: 1px solid #3e3e3e;
     border-radius: 6px;
     padding: 8px 16px;
     font-size: 13px;
     cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
 }
 .docmost-btn-secondary:hover {
-    background: #283049;
+    background: #383838;
+    color: #ffffff;
 }
 
-/* ===== EXCALIDRAW CLEAN DARK ENHANCEMENTS ===== */
+/* ===== EXCALIDRAW DOCMOST MANTINE DARK ENHANCEMENTS ===== */
 .excalidraw,
 .excalidraw-container,
 [data-testid="excalidraw-container"] {
     --theme-filter: none !important;
-    --color-surface-low: #131725 !important;
-    --color-surface-mid: #191f32 !important;
-    --color-surface-high: #222a42 !important;
-    --color-surface-lowest: #0c0f18 !important;
-    --color-on-surface: #f1f5f9 !important;
-    --color-muted: #94a3b8 !important;
-    --color-border: #28314a !important;
-    --color-primary: #6366f1 !important;
-    --color-primary-darker: #4f46e5 !important;
-    --color-primary-darkest: #4338ca !important;
-    --color-primary-light: #818cf8 !important;
-    background-color: #0c0f18 !important;
+    --color-surface-low: #1f1f1f !important;
+    --color-surface-mid: #242424 !important;
+    --color-surface-high: #2e2e2e !important;
+    --color-surface-lowest: #141414 !important;
+    --color-on-surface: #c9c9c9 !important;
+    --color-muted: #828282 !important;
+    --color-border: #383838 !important;
+    --color-primary: #228be6 !important;
+    --color-primary-darker: #1c7ed6 !important;
+    --color-primary-darkest: #1971c2 !important;
+    --color-primary-light: #74c0fc !important;
+    background-color: #141414 !important;
 }
 
 /* Excalidraw Canvas Background */
 .excalidraw canvas,
 .excalidraw .excalidraw__canvas {
-    background-color: #0c0f18 !important;
+    background-color: #141414 !important;
 }
 
 /* Floating Toolbars (Island) */
 .excalidraw .Island,
 .excalidraw .App-toolbar,
 .excalidraw .layer-ui__wrapper .Island {
-    background: rgba(18, 22, 34, 0.97) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    background: #242424 !important;
+    border: 1px solid #383838 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
     padding: 4px 6px !important;
 }
 
-/* Excalidraw Tool Icons (Shapes, Pencil, Text, Eraser, etc.) */
+/* Excalidraw Tool Icons */
 .excalidraw .ToolIcon_type_button,
 .excalidraw .ToolIcon_type_radio,
 .excalidraw .ToolIcon,
 .excalidraw button.ToolIcon {
-    border-radius: 8px !important;
-    color: #94a3b8 !important;
+    border-radius: 6px !important;
+    color: #b8b8b8 !important;
     background: transparent !important;
     border: 1px solid transparent !important;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: background-color 0.12s ease, color 0.12s ease !important;
     margin: 2px !important;
 }
 
 .excalidraw .ToolIcon:hover,
 .excalidraw .ToolIcon_type_button:hover,
 .excalidraw .ToolIcon_type_radio:hover {
-    background: rgba(99, 102, 241, 0.16) !important;
-    color: #c7d2fe !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
-    transform: translateY(-1px) !important;
-}
-
-.excalidraw .ToolIcon:active,
-.excalidraw .ToolIcon_type_button:active {
-    transform: translateY(0px) !important;
+    background: #2e2e2e !important;
+    color: #ffffff !important;
+    border-color: #424242 !important;
 }
 
 /* Active / Selected Tool */
@@ -387,10 +447,9 @@ body.has-desktop-menu .mantine-AppShell-header {
 .excalidraw .ToolIcon--selected,
 .excalidraw .ToolIcon.active,
 .excalidraw .ToolIcon[aria-pressed="true"] {
-    background: #6366f1 !important;
+    background: #228be6 !important;
     color: #ffffff !important;
-    border-color: #818cf8 !important;
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.5) !important;
+    border-color: #339af0 !important;
 }
 
 .excalidraw .ToolIcon--selected svg,
@@ -399,44 +458,44 @@ body.has-desktop-menu .mantine-AppShell-header {
     stroke: #ffffff !important;
 }
 
-/* Excalidraw Sidebar & Properties Panel (Stroke, Fill, Color, Opacity) */
+/* Excalidraw Sidebar & Properties Panel */
 .excalidraw .panelColumn,
 .excalidraw .sidebar-content,
 .excalidraw .layer-ui__wrapper .sidebar,
 .excalidraw .context-menu,
 .excalidraw .dropdown-menu,
 .excalidraw .popover {
-    background: #141826 !important;
-    border: 1px solid #28314a !important;
-    border-radius: 12px !important;
-    color: #f1f5f9 !important;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+    background: #242424 !important;
+    border: 1px solid #383838 !important;
+    border-radius: 8px !important;
+    color: #c9c9c9 !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7) !important;
 }
 
 .excalidraw .context-menu-item,
 .excalidraw .dropdown-menu-item {
-    color: #cbd5e1 !important;
-    border-radius: 6px !important;
-    transition: all 0.12s ease !important;
+    color: #c9c9c9 !important;
+    border-radius: 4px !important;
+    transition: background-color 0.12s ease, color 0.12s ease !important;
 }
 
 .excalidraw .context-menu-item:hover,
 .excalidraw .dropdown-menu-item:hover {
-    background: #20273c !important;
-    color: #818cf8 !important;
+    background: #2e2e2e !important;
+    color: #ffffff !important;
 }
 
 /* Excalidraw Color Picker Palette */
 .excalidraw .color-picker,
 .excalidraw .picker {
-    background: #141826 !important;
-    border: 1px solid #28314a !important;
-    border-radius: 10px !important;
+    background: #242424 !important;
+    border: 1px solid #383838 !important;
+    border-radius: 8px !important;
     padding: 8px !important;
 }
 
 .excalidraw .color-picker-swatch {
-    border-radius: 6px !important;
+    border-radius: 5px !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     transition: transform 0.1s ease !important;
 }
@@ -446,15 +505,15 @@ body.has-desktop-menu .mantine-AppShell-header {
     border-color: #ffffff !important;
 }
 
-/* Bottom Controls (Zoom, Undo, Redo, Help, Zen Mode) */
+/* Bottom Controls */
 .excalidraw .layer-ui__wrapper .footer-center,
 .excalidraw .layer-ui__wrapper .footer-left,
 .excalidraw .layer-ui__wrapper .footer-right,
 .excalidraw .undo-redo-buttons,
 .excalidraw .zoom-actions {
-    background: rgba(18, 22, 34, 0.96) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 10px !important;
+    background: #242424 !important;
+    border: 1px solid #383838 !important;
+    border-radius: 8px !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }
 
@@ -462,15 +521,15 @@ body.has-desktop-menu .mantine-AppShell-header {
 .excalidraw-modal-container,
 .excalidraw .Modal,
 .excalidraw .Modal__content {
-    background: #10131e !important;
-    border: 1px solid #252b40 !important;
-    border-radius: 14px !important;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8) !important;
-    color: #f1f5f9 !important;
+    background: #1f1f1f !important;
+    border: 1px solid #383838 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8) !important;
+    color: #c9c9c9 !important;
 }
 
 .excalidraw .Modal__header {
-    border-bottom: 1px solid #20273c !important;
+    border-bottom: 1px solid #2e2e2e !important;
 }
 
 /* Touch-Action & Pen Pointer Optimization */
@@ -485,31 +544,31 @@ body.has-desktop-menu .mantine-AppShell-header {
     -webkit-user-select: none !important;
 }
 
-/* Settings Tabs */
+/* Settings Tabs (Mantine Style) */
 .docmost-tabs-header {
     display: flex;
-    border-bottom: 1px solid #20273c;
-    padding: 0 16px;
-    background: #0f121d;
+    border-bottom: 1px solid #2e2e2e;
+    padding: 0 14px;
+    background: #1a1a1a;
     gap: 4px;
 }
 .docmost-tab-btn {
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
-    color: #94a3b8;
+    color: #828282;
     font-size: 13px;
     font-weight: 500;
-    padding: 10px 14px;
+    padding: 10px 12px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: color 0.12s ease, border-color 0.12s ease;
 }
 .docmost-tab-btn:hover {
-    color: #f1f5f9;
+    color: #c9c9c9;
 }
 .docmost-tab-btn.active {
-    color: #818cf8;
-    border-bottom-color: #6366f1;
+    color: #ffffff;
+    border-bottom-color: #228be6;
     font-weight: 600;
 }
 .docmost-tab-pane {
@@ -519,17 +578,17 @@ body.has-desktop-menu .mantine-AppShell-header {
     display: block;
 }
 
-/* Floating Stylus Quick Toolbar */
+/* Floating Stylus Quick Toolbar (Docmost Mantine Style) */
 #docmost-pen-toolbar {
     position: fixed;
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(18, 22, 34, 0.97);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #242424;
+    border: 1px solid #383838;
     border-radius: 40px;
     padding: 6px 14px;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
     z-index: 9999999;
     display: none;
     align-items: center;
@@ -545,7 +604,7 @@ body.has-desktop-menu .mantine-AppShell-header {
 .docmost-pen-btn {
     background: transparent;
     border: 1px solid transparent;
-    color: #cbd5e1;
+    color: #c9c9c9;
     border-radius: 20px;
     padding: 6px 12px;
     font-size: 12px;
@@ -554,18 +613,15 @@ body.has-desktop-menu .mantine-AppShell-header {
     display: flex;
     align-items: center;
     gap: 5px;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease;
 }
 .docmost-pen-btn:hover {
-    background: #1e2538;
+    background: #2e2e2e;
     color: #fff;
-    border-color: #2f3b58;
 }
 .docmost-pen-btn.active {
-    background: #6366f1;
+    background: #228be6;
     color: #fff;
-    border-color: #818cf8;
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
 }
 .docmost-color-dot {
     width: 20px;
@@ -583,7 +639,7 @@ body.has-desktop-menu .mantine-AppShell-header {
 .docmost-pen-stroke-btn {
     background: transparent;
     border: 1px solid transparent;
-    color: #94a3b8;
+    color: #828282;
     border-radius: 6px;
     width: 28px;
     height: 28px;
@@ -592,32 +648,32 @@ body.has-desktop-menu .mantine-AppShell-header {
     justify-content: center;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease;
 }
 .docmost-pen-stroke-btn:hover {
-    background: #1e2538;
+    background: #2e2e2e;
     color: #fff;
 }
 .docmost-pen-stroke-btn.active {
-    background: #252e46;
-    color: #818cf8;
-    border-color: #6366f1;
+    background: #2e2e2e;
+    color: #339af0;
+    border-color: #228be6;
 }
 
-/* Media Player Modal */
+/* Media Player Modal (Docmost Mantine Style) */
 #docmost-media-modal .docmost-modal-box {
     width: 860px;
     max-width: 95vw;
-    background: #0d101a;
-    border: 1px solid #28314a;
-    border-radius: 14px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+    background: #1f1f1f;
+    border: 1px solid #383838;
+    border-radius: 8px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.85);
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 .docmost-media-content {
-    background: #070911;
+    background: #141414;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -629,7 +685,7 @@ body.has-desktop-menu .mantine-AppShell-header {
 #docmost-media-video {
     max-width: 100%;
     max-height: 70vh;
-    border-radius: 8px;
+    border-radius: 6px;
     outline: none;
     background: #000;
 }
@@ -646,38 +702,37 @@ body.has-desktop-menu .mantine-AppShell-header {
     width: 68px;
     height: 68px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
+    background: linear-gradient(135deg, #228be6, #339af0);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
-    animation: pulseGlow 2s infinite;
+    box-shadow: 0 0 20px rgba(34, 139, 230, 0.4);
 }
 #docmost-media-audio {
     width: 85%;
     max-width: 550px;
 }
 .docmost-badge-format {
-    background: #1e2538;
-    color: #818cf8;
-    border: 1px solid #2f3956;
-    border-radius: 6px;
+    background: #2e2e2e;
+    color: #74c0fc;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
     font-size: 11px;
     font-weight: 700;
     padding: 2px 8px;
     text-transform: uppercase;
 }
 
-/* Office & Document Viewer Modal */
+/* Office & Document Viewer Modal (Docmost Mantine Style) */
 #docmost-office-modal .docmost-modal-box {
     width: 1040px;
     max-width: 96vw;
     height: 88vh;
-    background: #0e111c;
-    border: 1px solid #28314a;
-    border-radius: 14px;
-    box-shadow: 0 25px 65px rgba(0,0,0,0.9);
+    background: #1f1f1f;
+    border: 1px solid #383838;
+    border-radius: 8px;
+    box-shadow: 0 24px 65px rgba(0,0,0,0.85);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -686,7 +741,7 @@ body.has-desktop-menu .mantine-AppShell-header {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: #080a13;
+    background: #141414;
     position: relative;
     overflow: hidden;
 }
@@ -694,15 +749,15 @@ body.has-desktop-menu .mantine-AppShell-header {
     width: 100%;
     height: 100%;
     border: none;
-    background: #111422;
+    background: #1a1a1a;
 }
 .docmost-office-fallback-card {
     margin: auto;
     max-width: 560px;
     padding: 36px 30px;
-    background: #121626;
-    border: 1px solid #28314a;
-    border-radius: 12px;
+    background: #242424;
+    border: 1px solid #383838;
+    border-radius: 8px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -944,6 +999,44 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             document.dispatchEvent(new KeyboardEvent('keydown', {{ key: 'y', code: 'KeyY', ctrlKey: true, bubbles: true }}));
         }};
 
+        function escapeHtml(str) {{
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }}
+
+        function getUrlOrigin(u) {{
+            try {{ return new URL(u).origin.toLowerCase(); }} catch (e) {{ return String(u || '').replace(/\/+$/, '').toLowerCase(); }}
+        }}
+
+        window.goHome = function() {{
+            const target = (window.__docmostConfig && window.__docmostConfig.serverUrl) || '{url}';
+            window.closeAllDropdowns();
+            if (target) window.location.href = target;
+        }};
+
+        window.onDesktopConfigSync = function(newCfg) {{
+            if (!newCfg) return;
+            window.__docmostConfig = Object.assign({{}}, window.__docmostConfig || {{}}, newCfg);
+            applyZoom();
+
+            const menuBtn = document.getElementById('docmost-app-menu-btn');
+            if (menuBtn) {{
+                const activeSrv = (window.__docmostConfig.servers || []).find(s => s.id === window.__docmostConfig.activeServerId);
+                if (activeSrv) menuBtn.title = 'Menü • ' + activeSrv.name;
+            }}
+
+            if (document.getElementById('docmost-app-menu-servers-list')) {{
+                window.renderAppMenuServers();
+            }}
+            if (document.getElementById('settings-server-list')) {{
+                window.renderSettingsServerList();
+            }}
+        }};
+
         // Dropdown Menu Management (Top-Right 3-Line Menu)
         window.closeAllDropdowns = function() {{
             const appMenu = document.getElementById('docmost-app-dropdown-menu');
@@ -960,17 +1053,19 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             let html = '';
             servers.forEach(s => {{
                 const isActive = s.id === activeId;
-                const displayUrl = s.url.replace('https://', '').replace('http://', '');
+                const displayUrl = escapeHtml(s.url.replace(/^https?:\/\//i, ''));
+                const safeName = escapeHtml(s.name);
+                const safeId = escapeHtml(s.id);
                 html += `
-                    <div class="docmost-dropdown-item ${{isActive ? 'active' : ''}}" onclick="window.selectServer('${{s.id}}', '${{s.url}}')">
+                    <div class="docmost-dropdown-item ${{isActive ? 'active' : ''}}" data-server-id="${{safeId}}">
                         <div class="docmost-dropdown-item-left" style="flex:1; min-width:0;">
                             <span class="docmost-status-dot" style="${{isActive ? '' : 'background:#666; box-shadow:none;'}}"></span>
                             <div style="overflow:hidden;">
-                                <div style="font-size:13px; font-weight:600; color:${{isActive ? '#ffffff' : '#c9c9c9'}}; overflow:hidden; text-overflow:ellipsis;">${{s.name}} ${{isActive ? '<span style="font-size:10px; color:#339af0; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
+                                <div style="font-size:13px; font-weight:600; color:${{isActive ? '#ffffff' : '#c9c9c9'}}; overflow:hidden; text-overflow:ellipsis;">${{safeName}} ${{isActive ? '<span style="font-size:10px; color:#339af0; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
                                 <div style="font-size:11px; color:#828282; overflow:hidden; text-overflow:ellipsis;">${{displayUrl}}</div>
                             </div>
                         </div>
-                        ${{servers.length > 1 ? `<button class="docmost-server-del-btn" onclick="window.deleteServer(event, '${{s.id}}')" title="Server entfernen">✕</button>` : ''}}
+                        ${{servers.length > 1 ? `<button type="button" class="docmost-server-del-btn" data-delete-server-id="${{safeId}}" title="Server entfernen">✕</button>` : ''}}
                     </div>
                 `;
             }});
@@ -1016,19 +1111,21 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             let html = '';
             servers.forEach(s => {{
                 const isActive = s.id === activeId;
-                const displayUrl = s.url.replace('https://', '').replace('http://', '');
+                const displayUrl = escapeHtml(s.url.replace(/^https?:\/\//i, ''));
+                const safeName = escapeHtml(s.name);
+                const safeId = escapeHtml(s.id);
                 html += `
-                    <div style="padding:10px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2e2e2e; ${{isActive ? 'background:rgba(34,139,230,0.15); border-left:3px solid #228be6;' : ''}}">
-                        <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="padding:10px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2e2e2e; ${{isActive ? 'background:rgba(34,139,230,0.12); border-left:3px solid #228be6;' : ''}}">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">
                             <span class="docmost-status-dot" style="${{isActive ? '' : 'background:#666; box-shadow:none;'}}"></span>
-                            <div>
-                                <div style="font-size:13px; font-weight:600; color:#f1f5f9;">${{s.name}} ${{isActive ? '<span style="font-size:11px; color:#12b886; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
-                                <div style="font-size:11px; color:#828282;">${{displayUrl}}</div>
+                            <div style="overflow:hidden;">
+                                <div style="font-size:13px; font-weight:600; color:#f1f5f9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${{safeName}} ${{isActive ? '<span style="font-size:11px; color:#12b886; font-weight:normal;">(Aktiv)</span>' : ''}}</div>
+                                <div style="font-size:11px; color:#828282; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${{displayUrl}}</div>
                             </div>
                         </div>
-                        <div style="display:flex; gap:6px; align-items:center;">
-                            ${{!isActive ? `<button class="docmost-btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="window.selectServer('${{s.id}}', '${{s.url}}')">Wechseln</button>` : ''}}
-                            ${{servers.length > 1 ? `<button class="docmost-server-del-btn" onclick="window.deleteServer(event, '${{s.id}}')" title="Server entfernen">✕</button>` : ''}}
+                        <div style="display:flex; gap:6px; align-items:center; flex-shrink:0; margin-left:8px;">
+                            ${{!isActive ? `<button type="button" class="docmost-btn-secondary" style="padding:4px 10px; font-size:11px;" data-select-server-id="${{safeId}}">Wechseln</button>` : ''}}
+                            ${{servers.length > 1 ? `<button type="button" class="docmost-server-del-btn" data-delete-server-id="${{safeId}}" title="Server entfernen">✕</button>` : ''}}
                         </div>
                     </div>
                 `;
@@ -1043,28 +1140,41 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             }}
         }});
 
-        window.selectServer = function(id, url) {{
+        window.selectServer = function(id) {{
             window.closeAllDropdowns();
-            if (id === window.__docmostConfig.activeServerId && url === window.location.href) {{
+            const servers = window.__docmostConfig.servers || [];
+            const target = servers.find(s => s.id === id);
+            if (!target) return;
+
+            const sameOrigin = getUrlOrigin(target.url) === getUrlOrigin(window.location.href);
+            if (id === window.__docmostConfig.activeServerId && sameOrigin) {{
+                window.closeSettingsModal();
                 return;
             }}
             window.__docmostConfig.activeServerId = id;
+            window.__docmostConfig.serverUrl = target.url;
+            window.closeSettingsModal();
             if (window.ipc) {{
                 window.ipc.postMessage(JSON.stringify({{
                     action: 'switch_server',
                     server_id: id
                 }}));
+            }} else {{
+                window.location.href = target.url;
             }}
-            window.closeSettingsModal();
-            window.location.href = url;
         }};
 
         window.openAddServerModal = function(e) {{
             if (e) e.stopPropagation();
             window.closeAllDropdowns();
             createModals();
+            const nameInput = document.getElementById('input-new-server-name');
+            const urlInput = document.getElementById('input-new-server-url');
+            if (nameInput) nameInput.value = '';
+            if (urlInput) urlInput.value = '';
             const modal = document.getElementById('docmost-add-server-modal');
             if (modal) modal.style.display = 'flex';
+            if (nameInput) setTimeout(() => nameInput.focus(), 30);
         }};
 
         window.closeAddServerModal = function() {{
@@ -1081,30 +1191,32 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 alert('Bitte eine gültige Server-URL eingeben.');
                 return;
             }}
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {{
+            if (!/^https?:\/\//i.test(url)) {{
                 url = 'https://' + url;
             }}
+            window.closeAddServerModal();
+            window.closeSettingsModal();
             if (window.ipc) {{
                 window.ipc.postMessage(JSON.stringify({{
                     action: 'add_server',
                     server_name: name || url,
                     server_url: url
                 }}));
+            }} else {{
+                window.location.href = url;
             }}
-            window.closeAddServerModal();
-            window.location.href = url;
         }};
 
         window.deleteServer = function(e, id) {{
             if (e) e.stopPropagation();
             if (!confirm('Diesen Server wirklich aus der Liste entfernen?')) return;
+            window.__docmostConfig.servers = (window.__docmostConfig.servers || []).filter(s => s.id !== id);
             if (window.ipc) {{
                 window.ipc.postMessage(JSON.stringify({{
                     action: 'delete_server',
                     server_id: id
                 }}));
             }}
-            window.__docmostConfig.servers = (window.__docmostConfig.servers || []).filter(s => s.id !== id);
             window.renderAppMenuServers();
             window.renderSettingsServerList();
         }};
@@ -1530,6 +1642,23 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             document.body.appendChild(btn);
         }}
 
+        function bindServerContainerEvents(container) {{
+            if (!container || container.__boundServerEvents) return;
+            container.__boundServerEvents = true;
+            container.addEventListener('click', (e) => {{
+                const delBtn = e.target.closest('[data-delete-server-id]');
+                if (delBtn) {{
+                    window.deleteServer(e, delBtn.getAttribute('data-delete-server-id'));
+                    return;
+                }}
+                const selEl = e.target.closest('[data-select-server-id], [data-server-id]');
+                if (selEl) {{
+                    const id = selEl.getAttribute('data-select-server-id') || selEl.getAttribute('data-server-id');
+                    if (id) window.selectServer(id);
+                }}
+            }});
+        }}
+
         function createAppMenuDropdown() {{
             if (document.getElementById('docmost-app-dropdown-menu')) return;
             const menu = document.createElement('div');
@@ -1544,7 +1673,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                     <button class="docmost-dropdown-nav-btn" onclick="window.history.back(); window.closeAllDropdowns();" title="Zurück (Alt+◀)">◀</button>
                     <button class="docmost-dropdown-nav-btn" onclick="window.history.forward(); window.closeAllDropdowns();" title="Vorwärts (Alt+▶)">▶</button>
                     <button class="docmost-dropdown-nav-btn" onclick="window.location.reload(); window.closeAllDropdowns();" title="Seite neu laden (F5)">↻</button>
-                    <button class="docmost-dropdown-nav-btn" onclick="window.location.href='{url}'; window.closeAllDropdowns();" title="Startseite">🏠</button>
+                    <button class="docmost-dropdown-nav-btn" onclick="window.goHome();" title="Startseite">🏠</button>
                 </div>
                 <div id="docmost-update-btn" class="docmost-update-banner" onclick="window.openUpdateModal(); window.closeAllDropdowns();">
                     <span>⬆ Update verfügbar</span>
@@ -1572,6 +1701,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 </div>
             `;
             document.body.appendChild(menu);
+            bindServerContainerEvents(document.getElementById('docmost-app-menu-servers-list'));
         }}
 
         function createPenToolbar() {{
@@ -1585,23 +1715,23 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 <button id="tb-btn-eraser" class="docmost-pen-btn" onclick="window.activatePenTool('eraser')" title="Radierer (E / 0)">
                     <span>🧹</span><span>Radierer</span>
                 </button>
-                <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
+                <div style="width:1px; height:20px; background:#383838; margin:0 2px;"></div>
                 <button class="docmost-color-dot" style="background:#ffffff;" onclick="window.setPenColor('#ffffff')" title="Weiß"></button>
-                <button class="docmost-color-dot" style="background:#818cf8;" onclick="window.setPenColor('#818cf8')" title="Indigo"></button>
-                <button class="docmost-color-dot" style="background:#34d399;" onclick="window.setPenColor('#34d399')" title="Smaragdgrün"></button>
-                <button class="docmost-color-dot" style="background:#fbbf24;" onclick="window.setPenColor('#fbbf24')" title="Sonnengelb"></button>
-                <button class="docmost-color-dot" style="background:#f87171;" onclick="window.setPenColor('#f87171')" title="Korallenrot"></button>
-                <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
+                <button class="docmost-color-dot" style="background:#339af0;" onclick="window.setPenColor('#339af0')" title="Blau"></button>
+                <button class="docmost-color-dot" style="background:#12b886;" onclick="window.setPenColor('#12b886')" title="Grün"></button>
+                <button class="docmost-color-dot" style="background:#fab005;" onclick="window.setPenColor('#fab005')" title="Gelb"></button>
+                <button class="docmost-color-dot" style="background:#fa5252;" onclick="window.setPenColor('#fa5252')" title="Rot"></button>
+                <div style="width:1px; height:20px; background:#383838; margin:0 2px;"></div>
                 <button class="docmost-pen-stroke-btn" onclick="window.setPenStroke(1)" title="Feine Strichstärke">―</button>
                 <button class="docmost-pen-stroke-btn active" onclick="window.setPenStroke(2)" title="Mittlere Strichstärke">━</button>
                 <button class="docmost-pen-stroke-btn" onclick="window.setPenStroke(4)" title="Breite Strichstärke">█</button>
-                <div style="width:1px; height:20px; background:#28314a; margin:0 2px;"></div>
-                <div id="badge-palm-rejection" style="font-size:11px; color:#10b981; display:flex; align-items:center; gap:4px; padding:3px 8px; background:rgba(16,185,129,0.12); border-radius:12px;" title="Handballenschutz & Stiftmodus aktiv">
+                <div style="width:1px; height:20px; background:#383838; margin:0 2px;"></div>
+                <div id="badge-palm-rejection" style="font-size:11px; color:#12b886; display:flex; align-items:center; gap:4px; padding:3px 8px; background:rgba(18,184,134,0.12); border-radius:12px;" title="Handballenschutz &amp; Stiftmodus aktiv">
                     <span>🖐️</span><span>Stift aktiv</span>
                 </div>
                 <button class="docmost-pen-btn" onclick="window.penUndo()" title="Rückgängig (Strg+Z)">↩</button>
                 <button class="docmost-pen-btn" onclick="window.penRedo()" title="Wiederholen (Strg+Y)">↪</button>
-                <button class="docmost-pen-btn" style="padding:4px 8px; color:#94a3b8;" onclick="document.getElementById('docmost-pen-toolbar').style.display='none'" title="Leiste ausblenden">✕</button>
+                <button class="docmost-pen-btn" style="padding:4px 8px; color:#828282;" onclick="document.getElementById('docmost-pen-toolbar').style.display='none'" title="Leiste ausblenden">✕</button>
             `;
             document.body.appendChild(tb);
         }}
@@ -1615,32 +1745,32 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 <div id="docmost-settings-modal" class="docmost-modal-overlay">
                     <div class="docmost-modal-box" style="width: 540px;">
                         <div class="docmost-modal-header">
-                            <h3 style="margin:0; font-size: 16px;">Docmost Desktop Einstellungen</h3>
-                            <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="window.closeSettingsModal()">✕</span>
+                            <h3 style="margin:0; font-size: 15px; font-weight: 600;">Docmost Desktop Einstellungen</h3>
+                            <span class="docmost-modal-close" onclick="window.closeSettingsModal()">✕</span>
                         </div>
 
                         <!-- Tabs Header -->
                         <div class="docmost-tabs-header">
-                            <button id="tab-btn-general" class="docmost-tab-btn active" onclick="window.switchSettingsTab('general')">⚙ Allgemein & Server</button>
-                            <button id="tab-btn-pen" class="docmost-tab-btn" onclick="window.switchSettingsTab('pen')">🖊️ Stift & Excalidraw</button>
-                            <button id="tab-btn-office" class="docmost-tab-btn" onclick="window.switchSettingsTab('office')">📄 Office & Medien</button>
+                            <button id="tab-btn-general" class="docmost-tab-btn active" onclick="window.switchSettingsTab('general')">⚙ Allgemein &amp; Server</button>
+                            <button id="tab-btn-pen" class="docmost-tab-btn" onclick="window.switchSettingsTab('pen')">🖊️ Stift &amp; Excalidraw</button>
+                            <button id="tab-btn-office" class="docmost-tab-btn" onclick="window.switchSettingsTab('office')">📄 Office &amp; Medien</button>
                             <button id="tab-btn-updates" class="docmost-tab-btn" onclick="window.switchSettingsTab('updates')">🔄 Updates</button>
                         </div>
 
-                        <div class="docmost-modal-body" style="padding: 18px 20px;">
+                        <div class="docmost-modal-body">
                             <!-- Tab 1: Allgemein & Server -->
                             <div id="pane-general" class="docmost-tab-pane active">
-                                <div style="font-size: 13px; font-weight:600; color:#818cf8; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
+                                <div class="docmost-section-title">
                                     <span>🌐 Gespeicherte Server</span>
                                     <button class="docmost-add-server-btn" onclick="window.openAddServerModal(event)">+ Neu</button>
                                 </div>
-                                <div id="settings-server-list" style="background:#0e111a; border:1px solid #28314a; border-radius:8px; margin-bottom:16px; overflow:hidden;"></div>
+                                <div id="settings-server-list" class="docmost-surface-card" style="margin-bottom:16px;"></div>
 
-                                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">GitHub Repository (für Updates)</label>
-                                <input id="input-github-repo" type="text" value="{repo}" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:14px;" />
+                                <label class="docmost-field-label">GitHub Repository (für Updates)</label>
+                                <input id="input-github-repo" class="docmost-input" type="text" value="{repo}" style="margin-bottom:14px;" />
                                 
-                                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Oberflächen-Skalierung (Zoom)</label>
-                                <select id="select-ui-zoom" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:6px;">
+                                <label class="docmost-field-label">Oberflächen-Skalierung (Zoom)</label>
+                                <select id="select-ui-zoom" class="docmost-input" style="margin-bottom:6px;">
                                     <option value="0.9">90% (Kompakt)</option>
                                     <option value="1.0">100% (Standard)</option>
                                     <option value="1.1">110% (Leicht vergrößert)</option>
@@ -1651,40 +1781,40 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
                             <!-- Tab 2: Stift & Excalidraw -->
                             <div id="pane-pen" class="docmost-tab-pane">
-                                <div style="font-size: 13px; font-weight:600; color:#818cf8; margin-bottom: 12px; display:flex; align-items:center; gap:6px;">
-                                    <span>🖊️</span><span>Optimierung für Stylus, Surface Pen & Touchscreen</span>
+                                <div class="docmost-section-title" style="justify-content:flex-start;">
+                                    <span>🖊️</span><span>Optimierung für Stylus, Surface Pen &amp; Touchscreen</span>
                                 </div>
 
                                 <div style="display:flex; flex-direction:column; gap:12px;">
                                     <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
-                                        <input id="check-pen-mode" type="checkbox" {checked_pen_mode} style="margin-top:2px;" />
+                                        <input id="check-pen-mode" type="checkbox" {checked_pen_mode} style="margin-top:2px; accent-color:#228be6;" />
                                         <div>
                                             <div style="font-weight:600; color:#f1f5f9;">Stift-Modus (Pen-Only Mode)</div>
-                                            <div style="font-size:11px; color:#94a3b8;">Nur der digitale Stift zeichnet; Fingergesten scrollen oder zoomen die Leinwand.</div>
+                                            <div style="font-size:11px; color:#828282;">Nur der digitale Stift zeichnet; Fingergesten scrollen oder zoomen die Leinwand.</div>
                                         </div>
                                     </label>
 
                                     <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
-                                        <input id="check-palm-rejection" type="checkbox" {checked_palm_rejection} style="margin-top:2px;" />
+                                        <input id="check-palm-rejection" type="checkbox" {checked_palm_rejection} style="margin-top:2px; accent-color:#228be6;" />
                                         <div>
                                             <div style="font-weight:600; color:#f1f5f9;">Handballen-Schutz (Palm Rejection)</div>
-                                            <div style="font-size:11px; color:#94a3b8;">Ignoriert aufliegende Handflächen während des Zeichnens automatisch.</div>
+                                            <div style="font-size:11px; color:#828282;">Ignoriert aufliegende Handflächen während des Zeichnens automatisch.</div>
                                         </div>
                                     </label>
 
                                     <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
-                                        <input id="check-quick-toolbar" type="checkbox" {checked_quick_toolbar} style="margin-top:2px;" />
+                                        <input id="check-quick-toolbar" type="checkbox" {checked_quick_toolbar} style="margin-top:2px; accent-color:#228be6;" />
                                         <div>
                                             <div style="font-weight:600; color:#f1f5f9;">Schwebende Schnellzugriffsleiste</div>
-                                            <div style="font-size:11px; color:#94a3b8;">Zeigt beim Zeichnen eine ergonomische Leiste für Stift, Radierer, Farben und Stärken.</div>
+                                            <div style="font-size:11px; color:#828282;">Zeigt beim Zeichnen eine ergonomische Leiste für Stift, Radierer, Farben und Stärken.</div>
                                         </div>
                                     </label>
 
                                     <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
-                                        <input id="check-excalidraw-dark" type="checkbox" {checked_dark_theme} style="margin-top:2px;" />
+                                        <input id="check-excalidraw-dark" type="checkbox" {checked_dark_theme} style="margin-top:2px; accent-color:#228be6;" />
                                         <div>
                                             <div style="font-weight:600; color:#f1f5f9;">Clean Dark für Excalidraw erzwingen</div>
-                                            <div style="font-size:11px; color:#94a3b8;">Tiefdunkler Zeichenhintergrund ohne blendendes Weiß.</div>
+                                            <div style="font-size:11px; color:#828282;">Tiefdunkler Zeichenhintergrund ohne blendendes Weiß.</div>
                                         </div>
                                     </label>
                                 </div>
@@ -1692,45 +1822,45 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
                             <!-- Tab 4: Office & Medien -->
                             <div id="pane-office" class="docmost-tab-pane">
-                                <div style="font-size: 13px; font-weight:600; color:#818cf8; margin-bottom: 12px; display:flex; align-items:center; gap:6px;">
+                                <div class="docmost-section-title" style="justify-content:flex-start;">
                                     <span>📄</span><span>OnlyOffice &amp; Integrierter Medienplayer</span>
                                 </div>
 
                                 <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:14px;">
                                     <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
-                                        <input id="check-media-player" type="checkbox" {checked_media_player} style="margin-top:2px;" />
+                                        <input id="check-media-player" type="checkbox" {checked_media_player} style="margin-top:2px; accent-color:#228be6;" />
                                         <div>
                                             <div style="font-weight:600; color:#f1f5f9;">Integrierter Video- &amp; Audio-Player</div>
-                                            <div style="font-size:11px; color:#94a3b8;">Spielt Videos (MP4, WebM, MOV) und Audiodateien (MP3, WAV, M4A) direkt in der Desktop-App ab.</div>
+                                            <div style="font-size:11px; color:#828282;">Spielt Videos (MP4, WebM, MOV) und Audiodateien (MP3, WAV, M4A) direkt in der Desktop-App ab.</div>
                                         </div>
                                     </label>
 
                                     <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; cursor:pointer;">
-                                        <input id="check-office-viewer" type="checkbox" {checked_office_viewer} style="margin-top:2px;" />
+                                        <input id="check-office-viewer" type="checkbox" {checked_office_viewer} style="margin-top:2px; accent-color:#228be6;" />
                                         <div>
                                             <div style="font-weight:600; color:#f1f5f9;">Office- &amp; Dokumenten-Viewer</div>
-                                            <div style="font-size:11px; color:#94a3b8;">Ermöglicht das Öffnen von Word-, PowerPoint- &amp; Excel-Dateien mit 1 Klick in Ihrer lokalen Office-App oder OnlyOffice.</div>
+                                            <div style="font-size:11px; color:#828282;">Ermöglicht das Öffnen von Word-, PowerPoint- &amp; Excel-Dateien mit 1 Klick in Ihrer lokalen Office-App oder OnlyOffice.</div>
                                         </div>
                                     </label>
                                 </div>
 
-                                <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">OnlyOffice Document Server URL (optional)</label>
-                                <input id="input-onlyoffice-url" type="text" value="{onlyoffice_url}" placeholder="https://onlyoffice.meinedomain.de" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:6px;" />
-                                <div style="font-size:11px; color:#64748b;">Falls Sie einen OnlyOffice Document Server betreiben, können Dokumente direkt im Viewer eingebettet bearbeitet werden.</div>
+                                <label class="docmost-field-label">OnlyOffice Document Server URL (optional)</label>
+                                <input id="input-onlyoffice-url" class="docmost-input" type="text" value="{onlyoffice_url}" placeholder="https://onlyoffice.meinedomain.de" style="margin-bottom:6px;" />
+                                <div style="font-size:11px; color:#828282;">Falls Sie einen OnlyOffice Document Server betreiben, können Dokumente direkt im Viewer eingebettet bearbeitet werden.</div>
                             </div>
 
                             <!-- Tab 3: Updates -->
                             <div id="pane-updates" class="docmost-tab-pane">
                                 <div style="margin-bottom:14px;">
                                     <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
-                                        <input id="check-auto-update" type="checkbox" {checked_auto_up} />
+                                        <input id="check-auto-update" type="checkbox" {checked_auto_up} style="accent-color:#228be6;" />
                                         <span>Automatisch beim Start nach Updates suchen</span>
                                     </label>
                                 </div>
 
-                                <div style="background:#0e111a; padding:12px; border-radius:6px; border:1px solid #20273c; font-size:12px; color:#94a3b8; margin-bottom:14px;">
-                                    <div>Installierte Version: <strong style="color:#e2e8f0;">v{version}</strong></div>
-                                    <div id="update-status-text" style="margin-top:6px; color:#10b981;">✓ Status: Bereit</div>
+                                <div class="docmost-surface-card" style="padding:12px; font-size:12px; color:#828282; margin-bottom:14px;">
+                                    <div>Installierte Version: <strong style="color:#f1f5f9;">v{version}</strong></div>
+                                    <div id="update-status-text" style="margin-top:6px; color:#12b886;">✓ Status: Bereit</div>
                                 </div>
 
                                 <div style="display:flex; gap:8px;">
@@ -1742,7 +1872,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
                         <div class="docmost-modal-footer">
                             <button class="docmost-btn-secondary" onclick="window.closeSettingsModal()">Abbrechen</button>
-                            <button class="docmost-btn-primary" onclick="window.saveSettings()">Speichern & Übernehmen</button>
+                            <button class="docmost-btn-primary" onclick="window.saveSettings()">Speichern &amp; Übernehmen</button>
                         </div>
                     </div>
                 </div>
@@ -1751,19 +1881,19 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 <div id="docmost-add-server-modal" class="docmost-modal-overlay">
                     <div class="docmost-modal-box" style="width: 420px;">
                         <div class="docmost-modal-header">
-                            <h3 style="margin:0; font-size: 15px;">Neuen Server hinzufügen</h3>
-                            <span style="cursor:pointer; color:#94a3b8; font-size:18px;" onclick="window.closeAddServerModal()">✕</span>
+                            <h3 style="margin:0; font-size: 15px; font-weight: 600;">Neuen Server hinzufügen</h3>
+                            <span class="docmost-modal-close" onclick="window.closeAddServerModal()">✕</span>
                         </div>
                         <div class="docmost-modal-body">
-                            <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Name / Bezeichnung</label>
-                            <input id="input-new-server-name" type="text" placeholder="z. B. Arbeit, Wiki, Test" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px; margin-bottom:14px;" />
+                            <label class="docmost-field-label">Name / Bezeichnung</label>
+                            <input id="input-new-server-name" class="docmost-input" type="text" placeholder="z. B. Arbeit, Wiki, Test" style="margin-bottom:14px;" />
 
-                            <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">Docmost Server URL</label>
-                            <input id="input-new-server-url" type="text" placeholder="https://wiki.firma.de" style="width:100%; box-sizing:border-box; background:#0e111a; border:1px solid #28314a; border-radius:6px; padding:8px 12px; color:#fff; font-size:13px;" />
+                            <label class="docmost-field-label">Docmost Server URL</label>
+                            <input id="input-new-server-url" class="docmost-input" type="text" placeholder="https://wiki.firma.de" />
                         </div>
                         <div class="docmost-modal-footer">
                             <button class="docmost-btn-secondary" onclick="window.closeAddServerModal()">Abbrechen</button>
-                            <button class="docmost-btn-primary" onclick="window.submitAddServer()">Hinzufügen & Wechseln</button>
+                            <button class="docmost-btn-primary" onclick="window.submitAddServer()">Hinzufügen &amp; Wechseln</button>
                         </div>
                     </div>
                 </div>
@@ -1771,24 +1901,24 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 <!-- Update Available Modal -->
                 <div id="docmost-update-modal" class="docmost-modal-overlay">
                     <div class="docmost-modal-box">
-                        <div class="docmost-modal-header" style="background: linear-gradient(135deg, #1e1b4b, #1e293b);">
-                            <h3 style="margin:0; font-size: 16px; color:#a5b4fc;">🚀 Neues Update verfügbar!</h3>
-                            <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="window.closeUpdateModal()">✕</span>
+                        <div class="docmost-modal-header">
+                            <h3 style="margin:0; font-size: 15px; font-weight: 600; color:#f1f5f9;">🚀 Neues Update verfügbar</h3>
+                            <span class="docmost-modal-close" onclick="window.closeUpdateModal()">✕</span>
                         </div>
                         <div class="docmost-modal-body">
                             <div style="font-size:15px; font-weight:700; color:#f1f5f9; margin-bottom:4px;" id="update-modal-title">Docmost Desktop Update</div>
-                            <div style="font-size:12px; color:#94a3b8; margin-bottom:12px;">Eine neue Version steht auf GitHub bereit und kann mit einem Klick installiert werden.</div>
-                            <div id="update-modal-changelog" style="background:#0e111a; padding:12px; border-radius:6px; border:1px solid #20273c; font-size:12px; max-height:160px; overflow-y:auto; white-space:pre-wrap; color:#cbd5e1; font-family: monospace;"></div>
+                            <div style="font-size:12px; color:#828282; margin-bottom:12px;">Eine neue Version steht auf GitHub bereit und kann mit einem Klick installiert werden.</div>
+                            <div id="update-modal-changelog" class="docmost-surface-card" style="padding:12px; font-size:12px; max-height:160px; overflow-y:auto; white-space:pre-wrap; color:#c9c9c9; font-family: monospace;"></div>
                             <div id="update-progress-box" style="display:none; margin-top:14px;">
-                                <div style="font-size:12px; color:#818cf8; margin-bottom:6px; font-weight:600;">Lade Update herunter und starte Installer...</div>
-                                <div style="background:#0e111a; height:8px; border-radius:4px; overflow:hidden;">
-                                    <div id="update-progress-bar" style="background:#6366f1; width:100%; height:100%; animation: pulseGlow 1.5s infinite;"></div>
+                                <div style="font-size:12px; color:#74c0fc; margin-bottom:6px; font-weight:600;">Lade Update herunter und starte Installer...</div>
+                                <div style="background:#141414; height:8px; border-radius:4px; overflow:hidden; border:1px solid #2e2e2e;">
+                                    <div id="update-progress-bar" style="background:#228be6; width:100%; height:100%;"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="docmost-modal-footer">
                             <button class="docmost-btn-secondary" onclick="window.closeUpdateModal()">Später</button>
-                            <button id="btn-do-update" class="docmost-btn-primary" onclick="window.performUpdate()">Jetzt herunterladen & installieren</button>
+                            <button id="btn-do-update" class="docmost-btn-primary" onclick="window.performUpdate()">Jetzt herunterladen &amp; installieren</button>
                         </div>
                     </div>
                 </div>
@@ -1801,7 +1931,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                                 <span class="docmost-badge-format" id="media-modal-badge">MEDIA</span>
                                 <h3 style="margin:0; font-size: 15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:600px;" id="media-modal-title">Mediendatei</h3>
                             </div>
-                            <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="window.closeMediaPlayer()">✕</span>
+                            <span class="docmost-modal-close" onclick="window.closeMediaPlayer()">✕</span>
                         </div>
                         <div class="docmost-media-content">
                             <div id="docmost-video-container" style="display:flex; justify-content:center; align-items:center; width:100%;">
@@ -1827,7 +1957,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                                 <span class="docmost-badge-format" id="office-modal-badge">DOC</span>
                                 <h3 style="margin:0; font-size: 15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:680px;" id="office-modal-title">Dokument</h3>
                             </div>
-                            <span style="cursor:pointer; color:#94a3b8; font-size:18px; padding:0 4px;" onclick="window.closeOfficeModal()">✕</span>
+                            <span class="docmost-modal-close" onclick="window.closeOfficeModal()">✕</span>
                         </div>
                         <div class="docmost-office-body">
                             <iframe id="docmost-office-iframe" style="display:none;"></iframe>
@@ -1835,7 +1965,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                                 <div id="office-fallback-icon" style="font-size:48px;">📄</div>
                                 <div>
                                     <div id="office-fallback-filename" style="font-size:16px; font-weight:700; color:#f1f5f9; margin-bottom:6px;">Dokument</div>
-                                    <div style="font-size:13px; color:#94a3b8; max-width:440px; line-height:1.4;">
+                                    <div style="font-size:13px; color:#828282; max-width:440px; line-height:1.4;">
                                         Öffnen Sie diese Office-Datei mit einem Klick in Ihrer lokal installierten Office-Suite (Microsoft Word, PowerPoint, Excel oder OnlyOffice Desktop).
                                     </div>
                                 </div>
@@ -1857,6 +1987,14 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 </div>
             `;
             document.body.appendChild(modalContainer);
+            bindServerContainerEvents(document.getElementById('settings-server-list'));
+
+            const urlInput = document.getElementById('input-new-server-url');
+            if (urlInput) {{
+                urlInput.addEventListener('keydown', (e) => {{
+                    if (e.key === 'Enter') window.submitAddServer();
+                }});
+            }}
 
             const zoomSelect = document.getElementById('select-ui-zoom');
             if (zoomSelect) {{
@@ -1897,6 +2035,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                 }}
                 if (!window.__hasCheckedUpdateOnInit && window.ipc) {{
                     window.__hasCheckedUpdateOnInit = true;
+                    window.ipc.postMessage(JSON.stringify({{ action: 'request_config' }}));
                     window.ipc.postMessage(JSON.stringify({{ action: 'check_pending_update' }}));
                 }}
 
@@ -1998,8 +2137,8 @@ pub fn get_offline_or_setup_html(server_url: &str, current_version: &str, error_
         body {{
             margin: 0;
             padding: 0;
-            background: #0d0f17;
-            color: #f1f5f9;
+            background: #141414;
+            color: #c9c9c9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             align-items: center;
@@ -2007,88 +2146,88 @@ pub fn get_offline_or_setup_html(server_url: &str, current_version: &str, error_
             min-height: 100vh;
         }}
         .card {{
-            background: #141824;
-            border: 1px solid #232b3e;
-            border-radius: 16px;
-            padding: 40px;
-            width: 500px;
+            background: #1f1f1f;
+            border: 1px solid #383838;
+            border-radius: 10px;
+            padding: 36px;
+            width: 480px;
             max-width: 90vw;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75);
             text-align: center;
         }}
         .logo {{
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            border-radius: 16px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #228be6, #7950f2);
+            border-radius: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             color: #fff;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+            margin-bottom: 18px;
+            box-shadow: 0 8px 20px rgba(34, 139, 230, 0.35);
         }}
         h1 {{
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            margin: 0 0 8px 0;
-            color: #fff;
+            margin: 0 0 6px 0;
+            color: #f1f5f9;
         }}
         p.subtitle {{
-            color: #94a3b8;
-            font-size: 14px;
-            margin: 0 0 28px 0;
+            color: #828282;
+            font-size: 13px;
+            margin: 0 0 24px 0;
         }}
         .input-group {{
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }}
         label {{
             font-size: 12px;
-            font-weight: 600;
-            color: #cbd5e1;
+            font-weight: 500;
+            color: #b8b8b8;
             margin-bottom: 6px;
             display: block;
         }}
         input[type="text"] {{
             width: 100%;
             box-sizing: border-box;
-            background: #0a0d14;
-            border: 1px solid #28314a;
-            border-radius: 8px;
-            padding: 12px 14px;
-            color: #fff;
-            font-size: 14px;
-            transition: border-color 0.2s;
+            background: #141414;
+            border: 1px solid #383838;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #f1f5f9;
+            font-size: 13px;
+            transition: border-color 0.15s;
         }}
         input[type="text"]:focus {{
             outline: none;
-            border-color: #6366f1;
+            border-color: #228be6;
         }}
         .btn-connect {{
             width: 100%;
-            background: #6366f1;
+            background: #228be6;
             color: #fff;
             border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 15px;
+            border-radius: 6px;
+            padding: 11px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: background-color 0.15s, transform 0.1s;
         }}
         .btn-connect:hover {{
-            background: #4f46e5;
+            background: #1c7ed6;
         }}
         .btn-connect:active {{
             transform: scale(0.99);
         }}
         .footer-info {{
-            margin-top: 24px;
+            margin-top: 22px;
             font-size: 12px;
-            color: #64748b;
+            color: #828282;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -2096,7 +2235,7 @@ pub fn get_offline_or_setup_html(server_url: &str, current_version: &str, error_
         .btn-link {{
             background: none;
             border: none;
-            color: #818cf8;
+            color: #339af0;
             cursor: pointer;
             font-size: 12px;
             padding: 0;
@@ -2170,6 +2309,9 @@ mod tests {
         assert!(script.contains("toggleAppMenu"));
         assert!(script.contains("renderAppMenuServers"));
         assert!(script.contains("closeAllDropdowns"));
+        assert!(script.contains("onDesktopConfigSync"));
+        assert!(script.contains("bindServerContainerEvents"));
+        assert!(script.contains("goHome"));
         assert!(script.contains("docmost-media-modal"));
         assert!(script.contains("docmost-office-modal"));
         assert!(script.contains("openMediaPlayer"));
