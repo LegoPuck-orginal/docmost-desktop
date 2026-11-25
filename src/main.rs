@@ -6,6 +6,7 @@ mod ui;
 mod updater;
 
 use config::AppConfig;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -135,8 +136,35 @@ fn main() {
     }
 }
 
+fn spawn_dns_warmup(server_url: &str) {
+    let trimmed = server_url.trim();
+    if trimmed.is_empty() {
+        return;
+    }
+    let without_scheme = trimmed
+        .strip_prefix("https://")
+        .or_else(|| trimmed.strip_prefix("http://"))
+        .unwrap_or(trimmed);
+    let host_port = without_scheme.split('/').next().unwrap_or("");
+    if host_port.is_empty() {
+        return;
+    }
+    let target = if host_port.contains(':') {
+        host_port.to_string()
+    } else if trimmed.starts_with("http://") {
+        format!("{}:80", host_port)
+    } else {
+        format!("{}:443", host_port)
+    };
+    thread::spawn(move || {
+        use std::net::ToSocketAddrs;
+        let _ = target.to_socket_addrs();
+    });
+}
+
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let config = AppConfig::load();
+    spawn_dns_warmup(&config.server_url);
     let current_version = env!("CARGO_PKG_VERSION");
 
     let event_loop = EventLoopBuilder::<UserEvent>::with_user_event().build();
@@ -173,6 +201,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     let shared_config = Arc::new(Mutex::new(config.clone()));
     let shared_config_for_ipc = Arc::clone(&shared_config);
+    let config_dirty_in_session = Arc::new(AtomicBool::new(false));
+    let config_dirty_for_ipc = Arc::clone(&config_dirty_in_session);
     let proxy_for_ipc = proxy.clone();
 
     let pending_update: Arc<Mutex<Option<updater::ReleaseInfo>>> = Arc::new(Mutex::new(None));
@@ -184,13 +214,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or_else(|| std::path::PathBuf::from("."))
         .join("DocmostApp")
         .join("WebView2Data");
-    let _ = std::fs::create_dir_all(&data_dir);
+    if !data_dir.exists() {
+        let _ = std::fs::create_dir_all(&data_dir);
+    }
 
     let mut web_context = WebContext::new(Some(data_dir));
     let injection_script = ui::get_injection_script(&config, current_version);
 
     let mut builder = WebViewBuilder::new_with_web_context(&mut web_context)
-        .with_devtools(true)
+        .with_devtools(cfg!(debug_assertions))
         .with_background_color((20, 20, 20, 255))
         .with_initialization_script(&injection_script);
 
@@ -198,17 +230,20 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     {
         use wry::WebViewBuilderExtWindows;
         builder = builder.with_additional_browser_args(
-            "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --autoplay-policy=no-user-gesture-required --disable-gpu-compositing"
+            "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --autoplay-policy=no-user-gesture-required --disable-gpu-compositing --disable-background-networking --no-first-run --no-default-browser-check --disable-component-update --disable-domain-reliability --disable-client-side-phishing-detection --disable-sync"
         );
     }
 
-    builder = builder.with_on_page_load_handler(|event, url| {
-        let evt_str = match event {
-            wry::PageLoadEvent::Started => "Started",
-            wry::PageLoadEvent::Finished => "Finished",
-        };
-        append_bounded_log("docmost_navigation.log", &format!("[Navigation {}] {}\n", evt_str, url));
-    });
+    #[cfg(debug_assertions)]
+    {
+        builder = builder.with_on_page_load_handler(|event, url| {
+            let evt_str = match event {
+                wry::PageLoadEvent::Started => "Started",
+                wry::PageLoadEvent::Finished => "Finished",
+            };
+            append_bounded_log("docmost_navigation.log", &format!("[Navigation {}] {}\n", evt_str, url));
+        });
+    }
 
     if config.server_url.trim().is_empty() {
         builder = builder.with_html(ui::get_offline_or_setup_html(&config.server_url, current_version, None));
@@ -261,6 +296,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                             cfg.office_viewer_enabled = ov;
                         }
                         let _ = cfg.save();
+                        config_dirty_for_ipc.store(true, Ordering::Relaxed);
                         let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), false));
                     }
                     "open_temp_file" => {
@@ -302,14 +338,17 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
                     "request_config" => {
-                        let cfg = shared_config_for_ipc.lock().unwrap().clone();
-                        let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg, false));
+                        if config_dirty_for_ipc.load(Ordering::Relaxed) {
+                            let cfg = shared_config_for_ipc.lock().unwrap().clone();
+                            let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg, false));
+                        }
                     }
                     "switch_server" => {
                         let mut cfg = shared_config_for_ipc.lock().unwrap();
                         if let Some(id) = parsed.server_id {
                             if cfg.set_active_server(&id) {
                                 let _ = cfg.save();
+                                config_dirty_for_ipc.store(true, Ordering::Relaxed);
                                 let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), true));
                             }
                         }
@@ -336,6 +375,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                             cfg.active_server_id = Some(id);
                             cfg.server_url = clean_url;
                             let _ = cfg.save();
+                            config_dirty_for_ipc.store(true, Ordering::Relaxed);
                             let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), true));
                         }
                     }
@@ -354,6 +394,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                                     }
                                 }
                                 let _ = cfg.save();
+                                config_dirty_for_ipc.store(true, Ordering::Relaxed);
                                 let _ = proxy_for_ipc.send_event(UserEvent::SyncConfig(cfg.clone(), active_changed));
                             }
                         }
@@ -417,7 +458,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         let p = proxy.clone();
         let pend = Arc::clone(&pending_update);
         thread::spawn(move || {
-            thread::sleep(Duration::from_secs(3));
+            thread::sleep(Duration::from_secs(5));
             if let Ok(Some(info)) = updater::check_for_updates(&repo, &cur_ver) {
                 *pend.lock().unwrap() = Some(info.clone());
                 let _ = p.send_event(UserEvent::UpdateAvailable(info));

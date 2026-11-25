@@ -242,7 +242,9 @@ body.has-desktop-menu .mantine-AppShell-header {
     background: #228be6;
     color: #ffffff;
 }
+"#;
 
+pub const MODAL_UI_CSS: &str = r#"
 /* Injected Modal Overlay (Docmost Mantine Dark) */
 .docmost-modal-overlay {
     display: none;
@@ -384,6 +386,148 @@ body.has-desktop-menu .mantine-AppShell-header {
     color: #ffffff;
 }
 
+/* Settings Tabs (Mantine Style) */
+.docmost-tabs-header {
+    display: flex;
+    border-bottom: 1px solid #2e2e2e;
+    padding: 0 14px;
+    background: #1a1a1a;
+    gap: 4px;
+}
+.docmost-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #828282;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: color 0.12s ease, border-color 0.12s ease;
+}
+.docmost-tab-btn:hover {
+    color: #c9c9c9;
+}
+.docmost-tab-btn.active {
+    color: #ffffff;
+    border-bottom-color: #228be6;
+    font-weight: 600;
+}
+.docmost-tab-pane {
+    display: none;
+}
+.docmost-tab-pane.active {
+    display: block;
+}
+
+/* Media Player Modal (Docmost Mantine Style) */
+#docmost-media-modal .docmost-modal-box {
+    width: 860px;
+    max-width: 95vw;
+    background: #1f1f1f;
+    border: 1px solid #383838;
+    border-radius: 8px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.docmost-media-content {
+    background: #141414;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    max-height: 72vh;
+    position: relative;
+    padding: 8px;
+}
+#docmost-media-video {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 6px;
+    outline: none;
+    background: #000;
+}
+.docmost-audio-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    width: 100%;
+    gap: 16px;
+}
+.docmost-audio-visual {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #228be6, #339af0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 0 20px rgba(34, 139, 230, 0.4);
+}
+#docmost-media-audio {
+    width: 85%;
+    max-width: 550px;
+}
+.docmost-badge-format {
+    background: #2e2e2e;
+    color: #74c0fc;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    text-transform: uppercase;
+}
+
+/* Office & Document Viewer Modal (Docmost Mantine Style) */
+#docmost-office-modal .docmost-modal-box {
+    width: 1040px;
+    max-width: 96vw;
+    height: 88vh;
+    background: #1f1f1f;
+    border: 1px solid #383838;
+    border-radius: 8px;
+    box-shadow: 0 24px 65px rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.docmost-office-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #141414;
+    position: relative;
+    overflow: hidden;
+}
+#docmost-office-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #1a1a1a;
+}
+.docmost-office-fallback-card {
+    margin: auto;
+    max-width: 560px;
+    padding: 36px 30px;
+    background: #242424;
+    border: 1px solid #383838;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+"#;
+
+pub const EXCALIDRAW_UI_CSS: &str = r#"
 /* ===== EXCALIDRAW DOCMOST MANTINE DARK ENHANCEMENTS ===== */
 .excalidraw,
 .excalidraw-container,
@@ -544,40 +688,6 @@ body.has-desktop-menu .mantine-AppShell-header {
     -webkit-user-select: none !important;
 }
 
-/* Settings Tabs (Mantine Style) */
-.docmost-tabs-header {
-    display: flex;
-    border-bottom: 1px solid #2e2e2e;
-    padding: 0 14px;
-    background: #1a1a1a;
-    gap: 4px;
-}
-.docmost-tab-btn {
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: #828282;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 10px 12px;
-    cursor: pointer;
-    transition: color 0.12s ease, border-color 0.12s ease;
-}
-.docmost-tab-btn:hover {
-    color: #c9c9c9;
-}
-.docmost-tab-btn.active {
-    color: #ffffff;
-    border-bottom-color: #228be6;
-    font-weight: 600;
-}
-.docmost-tab-pane {
-    display: none;
-}
-.docmost-tab-pane.active {
-    display: block;
-}
-
 /* Floating Stylus Quick Toolbar (Docmost Mantine Style) */
 #docmost-pen-toolbar {
     position: fixed;
@@ -659,118 +769,44 @@ body.has-desktop-menu .mantine-AppShell-header {
     color: #339af0;
     border-color: #228be6;
 }
-
-/* Media Player Modal (Docmost Mantine Style) */
-#docmost-media-modal .docmost-modal-box {
-    width: 860px;
-    max-width: 95vw;
-    background: #1f1f1f;
-    border: 1px solid #383838;
-    border-radius: 8px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.85);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.docmost-media-content {
-    background: #141414;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 260px;
-    max-height: 72vh;
-    position: relative;
-    padding: 8px;
-}
-#docmost-media-video {
-    max-width: 100%;
-    max-height: 70vh;
-    border-radius: 6px;
-    outline: none;
-    background: #000;
-}
-.docmost-audio-view {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    width: 100%;
-    gap: 16px;
-}
-.docmost-audio-visual {
-    width: 68px;
-    height: 68px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #228be6, #339af0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 0 20px rgba(34, 139, 230, 0.4);
-}
-#docmost-media-audio {
-    width: 85%;
-    max-width: 550px;
-}
-.docmost-badge-format {
-    background: #2e2e2e;
-    color: #74c0fc;
-    border: 1px solid #3e3e3e;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 8px;
-    text-transform: uppercase;
-}
-
-/* Office & Document Viewer Modal (Docmost Mantine Style) */
-#docmost-office-modal .docmost-modal-box {
-    width: 1040px;
-    max-width: 96vw;
-    height: 88vh;
-    background: #1f1f1f;
-    border: 1px solid #383838;
-    border-radius: 8px;
-    box-shadow: 0 24px 65px rgba(0,0,0,0.85);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.docmost-office-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: #141414;
-    position: relative;
-    overflow: hidden;
-}
-#docmost-office-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: #1a1a1a;
-}
-.docmost-office-fallback-card {
-    margin: auto;
-    max-width: 560px;
-    padding: 36px 30px;
-    background: #242424;
-    border: 1px solid #383838;
-    border-radius: 8px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-}
 "#;
+
+/// Strips CSS comments and excessive whitespace to shrink injected script size and parse cost.
+pub fn compact_css(css: &str) -> String {
+    let mut no_comments = String::with_capacity(css.len());
+    let mut rest = css;
+    while let Some(start) = rest.find("/*") {
+        no_comments.push_str(&rest[..start]);
+        if let Some(end) = rest[start + 2..].find("*/") {
+            rest = &rest[start + 2 + end + 2..];
+        } else {
+            rest = "";
+            break;
+        }
+    }
+    no_comments.push_str(rest);
+
+    let mut out = String::with_capacity(no_comments.len());
+    for line in no_comments.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        if !out.is_empty() {
+            out.push(' ');
+        }
+        out.push_str(trimmed);
+    }
+    out
+}
 
 pub fn get_injection_script(config: &crate::config::AppConfig, current_version: &str) -> String {
     let servers_json = serde_json::to_string(&config.servers).unwrap_or_else(|_| "[]".to_string());
     let active_id = config.active_server_id.as_deref().unwrap_or("default");
     let active_name = config.active_server().map(|s| s.name.as_str()).unwrap_or("Server");
+    let css_global_js = serde_json::to_string(&compact_css(CLEAN_DARK_GLOBAL_CSS)).unwrap_or_else(|_| "\"\"".to_string());
+    let css_modals_js = serde_json::to_string(&compact_css(MODAL_UI_CSS)).unwrap_or_else(|_| "\"\"".to_string());
+    let css_excalidraw_js = serde_json::to_string(&compact_css(EXCALIDRAW_UI_CSS)).unwrap_or_else(|_| "\"\"".to_string());
 
     format!(r#"
 (function() {{
@@ -819,20 +855,38 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }};
 
         let styleInjected = false;
+        let modalStyleInjected = false;
+        let excalidrawStyleInjected = false;
+        let appMenuOpen = false;
+        let modalsCreated = false;
         let lastZoomApplied = null;
         let excalidrawWasPresent = false;
 
-        // Safe CSS Injection (cached)
+        const injectStyleOnce = (id, cssText) => {{
+            if (document.getElementById(id)) return true;
+            const target = document.head || document.documentElement;
+            if (!target) return false;
+            const style = document.createElement('style');
+            style.id = id;
+            style.textContent = cssText;
+            target.appendChild(style);
+            return true;
+        }};
+
+        // Safe CSS Injection (cached & split for fast startup)
         const injectStyles = () => {{
             if (styleInjected && document.getElementById('docmost-desktop-style')) return;
-            if (document.getElementById('docmost-desktop-style')) {{ styleInjected = true; return; }}
-            const target = document.head || document.documentElement;
-            if (!target) return;
-            const style = document.createElement('style');
-            style.id = 'docmost-desktop-style';
-            style.textContent = `{css}`;
-            target.appendChild(style);
-            styleInjected = true;
+            styleInjected = injectStyleOnce('docmost-desktop-style', {css});
+        }};
+
+        const injectModalStyles = () => {{
+            if (modalStyleInjected) return;
+            modalStyleInjected = injectStyleOnce('docmost-desktop-modal-style', {modal_css});
+        }};
+
+        const injectExcalidrawStyles = () => {{
+            if (excalidrawStyleInjected) return;
+            excalidrawStyleInjected = injectStyleOnce('docmost-desktop-excalidraw-style', {excalidraw_css});
         }};
 
         // Safe Zoom (cached to avoid redundant style recalc)
@@ -882,6 +936,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         const checkExcalidrawPresence = () => {{
             const hasExcalidraw = !!document.querySelector('.excalidraw, [data-testid="excalidraw-container"]');
             if (hasExcalidraw) {{
+                injectExcalidrawStyles();
                 ensureExcalidrawDark();
                 if (!excalidrawWasPresent) {{
                     excalidrawWasPresent = true;
@@ -1039,6 +1094,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
         // Dropdown Menu Management (Top-Right 3-Line Menu)
         window.closeAllDropdowns = function() {{
+            appMenuOpen = false;
             const appMenu = document.getElementById('docmost-app-dropdown-menu');
             if (appMenu) appMenu.style.display = 'none';
             const menuBtn = document.getElementById('docmost-app-menu-btn');
@@ -1081,6 +1137,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
             if (menu.style.display === 'flex') {{
                 menu.style.display = 'none';
+                appMenuOpen = false;
                 if (menuBtn) menuBtn.classList.remove('active');
             }} else {{
                 window.renderAppMenuServers();
@@ -1099,6 +1156,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
                     menuBtn.classList.add('active');
                 }}
                 menu.style.display = 'flex';
+                appMenuOpen = true;
             }}
         }};
 
@@ -1134,6 +1192,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }};
 
         window.addEventListener('click', (e) => {{
+            if (!appMenuOpen) return;
             if (!e.target.closest('#docmost-app-dropdown-menu') &&
                 !e.target.closest('#docmost-app-menu-btn')) {{
                 window.closeAllDropdowns();
@@ -1574,6 +1633,8 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
         // Global Click Interceptor for Media and Office Attachments
         document.addEventListener('click', (e) => {{
+            const cfg = window.__docmostConfig;
+            if (!cfg || (!cfg.mediaPlayerEnabled && !cfg.officeViewerEnabled)) return;
             const link = e.target.closest('a');
             if (!link) return;
             const href = link.getAttribute('href') || '';
@@ -1607,18 +1668,19 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
 
         // Keyboard shortcuts
         window.addEventListener('keydown', (e) => {{
-            if (e.key === 'Escape') {{
-                window.closeAllDropdowns();
-                const mediaModal = document.getElementById('docmost-media-modal');
-                if (mediaModal && mediaModal.style.display === 'flex') {{
-                    window.closeMediaPlayer();
-                    return;
-                }}
-                const officeModal = document.getElementById('docmost-office-modal');
-                if (officeModal && officeModal.style.display === 'flex') {{
-                    window.closeOfficeModal();
-                    return;
-                }}
+            if (e.key !== 'Escape') return;
+            if (!appMenuOpen && !modalsCreated) return;
+            if (appMenuOpen) window.closeAllDropdowns();
+            if (!modalsCreated) return;
+            const mediaModal = document.getElementById('docmost-media-modal');
+            if (mediaModal && mediaModal.style.display === 'flex') {{
+                window.closeMediaPlayer();
+                return;
+            }}
+            const officeModal = document.getElementById('docmost-office-modal');
+            if (officeModal && officeModal.style.display === 'flex') {{
+                window.closeOfficeModal();
+                return;
             }}
         }});
 
@@ -1737,7 +1799,11 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
         }}
 
         function createModals() {{
-            if (document.getElementById('docmost-settings-modal')) return;
+            if (document.getElementById('docmost-settings-modal')) {{
+                modalsCreated = true;
+                return;
+            }}
+            injectModalStyles();
             const modalContainer = document.createElement('div');
             modalContainer.id = 'docmost-desktop-modals';
             modalContainer.innerHTML = `
@@ -2000,6 +2066,7 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
             if (zoomSelect) {{
                 zoomSelect.value = String(window.__docmostConfig.zoomLevel || 1.0);
             }}
+            modalsCreated = true;
         }}
 
         let observer = null;
@@ -2093,7 +2160,9 @@ pub fn get_injection_script(config: &crate::config::AppConfig, current_version: 
     }}
 }})();
     "#,
-    css = CLEAN_DARK_GLOBAL_CSS,
+    css = css_global_js,
+    modal_css = css_modals_js,
+    excalidraw_css = css_excalidraw_js,
     url = config.server_url,
     active_server_name = active_name,
     servers_json = servers_json,
@@ -2286,7 +2355,7 @@ pub fn get_offline_or_setup_html(server_url: &str, current_version: &str, error_
     </script>
 </body>
 </html>"#,
-    css = CLEAN_DARK_GLOBAL_CSS,
+    css = compact_css(CLEAN_DARK_GLOBAL_CSS),
     error_html = err_block,
     url = server_url,
     version = current_version
@@ -2296,6 +2365,14 @@ pub fn get_offline_or_setup_html(server_url: &str, current_version: &str, error_
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_compact_css_strips_comments_and_whitespace() {
+        let raw = "/* Header */\nbody {\n    color: #fff;\n    background: #141414;\n}\n/* End */";
+        let compacted = compact_css(raw);
+        assert_eq!(compacted, "body { color: #fff; background: #141414; }");
+        assert!(!compacted.contains("/*"));
+    }
 
     #[test]
     fn test_injection_script_output() {
@@ -2316,5 +2393,9 @@ mod tests {
         assert!(script.contains("docmost-office-modal"));
         assert!(script.contains("openMediaPlayer"));
         assert!(script.contains("openOfficeModal"));
+        assert!(script.contains("docmost-desktop-modal-style"));
+        assert!(script.contains("docmost-desktop-excalidraw-style"));
+        assert!(script.contains("injectModalStyles"));
+        assert!(script.contains("injectExcalidrawStyles"));
     }
 }
